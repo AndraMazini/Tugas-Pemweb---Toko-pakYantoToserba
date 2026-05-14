@@ -24,7 +24,7 @@ app.use('/api/categories', require('./src/routes/categoryRoutes'));
 app.use('/api/gallery', require('./src/routes/galleryRoutes'));
 app.use('/api/testimonials', require('./src/routes/testimonialRoutes'));
 app.use('/api/blog', require('./src/routes/blogRoutes'));
-// app.use('/api/orders', require('./src/routes/orderRoutes'));
+app.use('/api/orders', require('./src/routes/orderRoutes'));
 
 // Health check
 app.get('/', (req, res) => {
