@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Toko Pak Yanto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/index.html" class="text-xl font-bold text-orange-600">🏪 Toko Pak Yanto</a>
+      <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+        <li><a href="/index.html" class="hover:text-orange-600">Beranda</a></li>
+        <li><a href="/katalog.html" class="hover:text-orange-600">Katalog</a></li>
+        <li><a href="/galeri.html" class="hover:text-orange-600">Galeri</a></li>
+        <li><a href="/blog.html" class="text-orange-600 font-bold">Blog</a></li>
+        <li><a href="/kontak.html" class="hover:text-orange-600">Kontak</a></li>
+      </ul>
+      <a href="/kontak.html" class="bg-orange-600 text-white text-sm px-4 py-2 rounded-full hover:bg-orange-700 transition">💬 Hubungi Kami</a>
+    </div>
+  </nav>
+
+  <div class="pt-20 max-w-6xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-extrabold text-gray-800">Blog & <span class="text-orange-600">Artikel</span></h1>
+    <p class="text-gray-500 mt-1">Tips, promo, dan informasi terbaru dari toko kami</p>
+
+    <!-- GRID BLOG — JANGAN UBAH id="blog-grid" -->
+    <div id="blog-grid" class="grid md:grid-cols-3 gap-6 mt-8">
+      <div class="col-span-full text-center text-gray-400 py-16">Memuat artikel...</div>
+    </div>
+
+    <!-- PAGINATION — JANGAN UBAH id="pagination" -->
+    <div id="pagination" class="flex justify-center gap-2 mt-10"></div>
+  </div>
+
+  <footer class="bg-gray-800 text-white py-8 mt-16">
+    <div class="text-center text-sm text-gray-400">© 2025 Toko Pak Yanto — Jl. Asrama Brimob, Bandung</div>
+  </footer>
+
+  <a href="/kontak.html" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 transition z-50">💬</a>
+
+  <script src="js/api.js"></script>
+  <script src="js/blog.js"></script>
+</body>
+</html>

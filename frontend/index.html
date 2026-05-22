@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toko Pak Yanto — Peralatan Rumah Tangga</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+  <!-- ═══════════════════════════════════════════════════════
+       NAVBAR
+  ════════════════════════════════════════════════════════ -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/index.html" class="text-xl font-bold text-orange-600">🏪 Toko Pak Yanto</a>
+      <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+        <li><a href="/index.html" class="text-orange-600 font-bold">Beranda</a></li>
+        <li><a href="/katalog.html" class="hover:text-orange-600">Katalog</a></li>
+        <li><a href="/galeri.html" class="hover:text-orange-600">Galeri</a></li>
+        <li><a href="/blog.html" class="hover:text-orange-600">Blog</a></li>
+        <li><a href="/kontak.html" class="hover:text-orange-600">Kontak</a></li>
+      </ul>
+      <a href="/kontak.html" class="bg-orange-600 text-white text-sm px-4 py-2 rounded-full hover:bg-orange-700 transition">
+        💬 Hubungi Kami
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       HERO SECTION
+       TODO: Sesuaikan teks tagline dan deskripsi toko
+  ════════════════════════════════════════════════════════ -->
+  <section class="min-h-screen flex items-center bg-gradient-to-br from-orange-50 to-white pt-20">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center py-16">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-orange-500 bg-orange-100 px-3 py-1 rounded-full">
+          📍 Jl. Asrama Brimob, Bandung
+        </span>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mt-4 leading-tight">
+          Peralatan Rumah Tangga<br>
+          <span class="text-orange-600">Lengkap & Terjangkau</span>
+        </h1>
+        <p class="text-gray-500 mt-4 text-lg leading-relaxed">
+          Dari piring, ember, keranjang, hingga perkakas dapur — semua tersedia dengan harga bersaing langsung dari toko kami.
+        </p>
+        <div class="flex gap-3 mt-6 flex-wrap">
+          <a href="/katalog.html" class="bg-orange-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-700 transition">
+            🛒 Lihat Katalog
+          </a>
+          <a href="/kontak.html" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-full font-semibold hover:border-orange-400 hover:text-orange-600 transition">
+            📍 Lokasi Kami
+          </a>
+        </div>
+        <div class="flex gap-8 mt-10">
+          <div>
+            <div class="text-3xl font-extrabold text-orange-600">500+</div>
+            <div class="text-sm text-gray-400 mt-1">Jenis Produk</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-orange-600">10+</div>
+            <div class="text-sm text-gray-400 mt-1">Tahun Berdiri</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-orange-600">1000+</div>
+            <div class="text-sm text-gray-400 mt-1">Pelanggan Setia</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl shadow p-5 text-center hover:-translate-y-1 transition mt-6">
+          <div class="text-4xl mb-2">🍽️</div>
+          <div class="text-xs text-gray-400">Peralatan Makan</div>
+          <div class="font-bold text-gray-700 mt-1">Piring & Gelas</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-5 text-center hover:-translate-y-1 transition -mt-6">
+          <div class="text-4xl mb-2">🧺</div>
+          <div class="text-xs text-gray-400">Penyimpanan</div>
+          <div class="font-bold text-gray-700 mt-1">Keranjang & Box</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-5 text-center hover:-translate-y-1 transition">
+          <div class="text-4xl mb-2">🪣</div>
+          <div class="text-xs text-gray-400">Kebersihan</div>
+          <div class="font-bold text-gray-700 mt-1">Ember & Baskom</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-5 text-center hover:-translate-y-1 transition -mt-6">
+          <div class="text-4xl mb-2">🍳</div>
+          <div class="text-xs text-gray-400">Dapur</div>
+          <div class="font-bold text-gray-700 mt-1">Perkakas Masak</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       KATEGORI — Data dari API /api/categories
+       JANGAN UBAH id="kategori-grid"
+  ════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="text-orange-500 font-bold text-xs uppercase tracking-widest">Kategori</p>
+      <h2 class="text-3xl font-extrabold text-gray-800 mt-1">Semua Ada, <span class="text-orange-600">Harga Bersaing</span></h2>
+      <div id="kategori-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-8">
+        <div class="col-span-full text-center text-gray-400 py-8">Memuat kategori...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PRODUK UNGGULAN — Data dari API /api/products?featured=true
+       JANGAN UBAH id="produk-grid"
+  ════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-orange-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="text-orange-500 font-bold text-xs uppercase tracking-widest">Terlaris</p>
+      <h2 class="text-3xl font-extrabold text-gray-800 mt-1">Produk <span class="text-orange-600">Unggulan</span></h2>
+      <div id="produk-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
+        <div class="col-span-full text-center text-gray-400 py-8">Memuat produk...</div>
+      </div>
+      <div class="text-center mt-10">
+        <a href="/katalog.html" class="bg-orange-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-orange-700 transition">
+          Lihat Semua Produk →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       KEUNGGULAN — Statis, boleh diedit teksnya
+  ════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="text-orange-500 font-bold text-xs uppercase tracking-widest">Keunggulan Kami</p>
+      <h2 class="text-3xl font-extrabold text-gray-800 mt-1">Kenapa Pilih <span class="text-orange-600">Toko Kami?</span></h2>
+      <div class="grid md:grid-cols-4 gap-6 mt-8">
+        <div class="bg-orange-50 rounded-2xl p-6 hover:shadow-md transition">
+          <div class="text-3xl mb-3">💰</div>
+          <h3 class="font-bold text-gray-800 mb-2">Harga Grosir & Eceran</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Beli satuan atau partai besar, harga tetap bersaing.</p>
+        </div>
+        <div class="bg-orange-50 rounded-2xl p-6 hover:shadow-md transition">
+          <div class="text-3xl mb-3">📦</div>
+          <h3 class="font-bold text-gray-800 mb-2">Stok Selalu Lengkap</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Lebih dari 500 jenis produk tersedia setiap saat.</p>
+        </div>
+        <div class="bg-orange-50 rounded-2xl p-6 hover:shadow-md transition">
+          <div class="text-3xl mb-3">⭐</div>
+          <h3 class="font-bold text-gray-800 mb-2">Kualitas Terjamin</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Produk pilihan dari merek terpercaya, tahan lama.</p>
+        </div>
+        <div class="bg-orange-50 rounded-2xl p-6 hover:shadow-md transition">
+          <div class="text-3xl mb-3">📍</div>
+          <h3 class="font-bold text-gray-800 mb-2">Lokasi Strategis</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Mudah dijangkau dari berbagai arah, parkir tersedia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TESTIMONI — Data dari API /api/testimonials
+       JANGAN UBAH id="testimoni-grid"
+  ════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="text-orange-500 font-bold text-xs uppercase tracking-widest">Testimoni</p>
+      <h2 class="text-3xl font-extrabold text-gray-800 mt-1">Kata <span class="text-orange-600">Pelanggan Kami</span></h2>
+      <div id="testimoni-grid" class="grid md:grid-cols-3 gap-6 mt-8">
+        <div class="col-span-full text-center text-gray-400 py-8">Memuat testimoni...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       BLOG PREVIEW — Data dari API /api/blog?limit=3
+       JANGAN UBAH id="blog-grid"
+  ════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="text-orange-500 font-bold text-xs uppercase tracking-widest">Blog</p>
+      <h2 class="text-3xl font-extrabold text-gray-800 mt-1">Artikel <span class="text-orange-600">Terbaru</span></h2>
+      <div id="blog-grid" class="grid md:grid-cols-3 gap-6 mt-8">
+        <div class="col-span-full text-center text-gray-400 py-8">Memuat artikel...</div>
+      </div>
+      <div class="text-center mt-10">
+        <a href="/blog.html" class="border border-orange-600 text-orange-600 px-8 py-3 rounded-full font-semibold hover:bg-orange-600 hover:text-white transition">
+          Lihat Semua Artikel →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FOOTER — Statis, sesuaikan kontak toko
+  ════════════════════════════════════════════════════════ -->
+  <footer class="bg-gray-800 text-white py-10">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
+      <div>
+        <div class="text-xl font-bold text-orange-400 mb-2">🏪 Toko Pak Yanto</div>
+        <p class="text-sm text-gray-400 leading-relaxed">Peralatan rumah tangga lengkap dengan harga terjangkau.</p>
+      </div>
+      <div>
+        <div class="font-semibold mb-3">Menu</div>
+        <ul class="text-sm text-gray-400 space-y-2">
+          <li><a href="/katalog.html" class="hover:text-orange-400">Katalog Produk</a></li>
+          <li><a href="/galeri.html" class="hover:text-orange-400">Galeri</a></li>
+          <li><a href="/blog.html" class="hover:text-orange-400">Blog</a></li>
+          <li><a href="/kontak.html" class="hover:text-orange-400">Kontak</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-semibold mb-3">Kontak</div>
+        <ul class="text-sm text-gray-400 space-y-2">
+          <li>📍 Jl. Asrama Brimob, Bandung</li>
+          <li>🕐 Senin–Sabtu: 07.00–17.00</li>
+          <li>💬 WhatsApp: 0812-xxxx-xxxx</li>
+        </ul>
+      </div>
+    </div>
+    <div class="text-center text-xs text-gray-500 mt-8 border-t border-gray-700 pt-6">
+      © 2025 Toko Pak Yanto. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- WA Float Button -->
+  <a href="/kontak.html"
+     class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 hover:scale-110 transition z-50"
+     title="Hubungi Kami">💬</a>
+
+  <script src="js/api.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>
