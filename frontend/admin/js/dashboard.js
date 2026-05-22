@@ -1,16 +1,28 @@
 // dashboard.js — Logic halaman Dashboard Admin
-// Dikerjakan oleh: Anggota Frontend 2
 
 document.addEventListener('DOMContentLoaded', () => {
   cekLogin();
+  validasiRoleSuperadmin(); // 🌟 Tambahan validasi menu superadmin
   loadStats();
   tampilkanNamaAdmin();
 });
 
 function cekLogin() {
   if (!isLoggedIn()) {
-    // Redirect ke login relatif terhadap folder admin
     window.location.href = './login.html';
+  }
+}
+
+// 🌟 TAMBAHAN: Logika menyalakan menu rahasia jika role sesuai
+function validasiRoleSuperadmin() {
+  const user = JSON.parse(localStorage.getItem('admin_user') || '{}');
+  
+  if (user.role === 'superadmin') {
+    const menu = document.getElementById('menu-superadmin');
+    const shortcut = document.getElementById('shortcut-superadmin');
+    
+    if (menu) menu.classList.remove('hidden');
+    if (shortcut) shortcut.classList.remove('hidden');
   }
 }
 
@@ -19,14 +31,14 @@ function tampilkanNamaAdmin() {
   const el = document.getElementById('admin-name');
 
   if (el && user.name) {
-    el.textContent = user.name;
+    // Tambahkan badge status role agar admin tahu tingkatan mereka
+    el.innerHTML = `${user.name} <span class="block text-[10px] uppercase tracking-wider text-orange-400 font-bold mt-0.5">${user.role}</span>`;
   }
 }
 
 function logout() {
   removeToken();
-
-  // Redirect relatif
+  localStorage.removeItem('admin_user'); // Bersihkan sisa data user saat logout
   window.location.href = './login.html';
 }
 

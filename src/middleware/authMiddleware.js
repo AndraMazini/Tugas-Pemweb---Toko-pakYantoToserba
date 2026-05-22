@@ -25,4 +25,12 @@ const adminOnly = (req, res, next) => {
   next();
 };
 
-module.exports = { protect, adminOnly };
+// 🌟 TAMBAHAN: Validasi khusus untuk Superadmin
+const superadminOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Akses ditolak, hanya untuk Superadmin' });
+  }
+  next();
+};
+
+module.exports = { protect, adminOnly, superadminOnly };

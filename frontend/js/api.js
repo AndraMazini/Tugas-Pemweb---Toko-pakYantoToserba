@@ -3,7 +3,8 @@
 //  File ini dipakai bersama oleh landing page & admin panel
 // ============================================================
 
-const BASE_URL = 'http://localhost:5000';  // kosong karena satu server dengan backend
+// Disesuaikan ke port backend Node.js 5000 yang sedang berjalan aktif
+const BASE_URL = 'http://localhost:5000'; 
 
 // ─── HELPER ─────────────────────────────────────────────────
 function getToken() {
@@ -39,6 +40,13 @@ function authHeader() {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${getToken()}`
   };
+}
+
+// ─── GLOBAL AUTH ACTIONS ─────────────────────────────────────
+function logout() {
+  removeToken();
+  // Jalur aman relatif dari subfolder admin maupun landing page utama
+  window.location.href = 'login.html'; 
 }
 
 // ─── AUTH ────────────────────────────────────────────────────
@@ -106,7 +114,7 @@ async function createProduct(formData) {
   const res = await fetch(`${BASE_URL}/api/products`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${getToken()}` },
-    body: formData  // FormData, bukan JSON
+    body: formData  
   });
   return res.json();
 }
@@ -250,6 +258,11 @@ async function getAllOrders(params = {}) {
     headers: authHeader()
   });
   return res.json();
+}
+
+// Jembatan / Alias fungsi agar orders.html dan orders.js tidak error mencari fungsi getOrders
+async function getOrders() {
+  return getAllOrders();
 }
 
 async function updateOrderStatus(id, status) {

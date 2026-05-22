@@ -19,12 +19,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
 app.use('/api/auth', require('./src/routes/authRoutes'));
 
 // Routes person lain akan ditambahkan di sini
-// app.use('/api/products', require('./src/routes/productRoutes'));
-// app.use('/api/categories', require('./src/routes/categoryRoutes'));
-// app.use('/api/gallery', require('./src/routes/galleryRoutes'));
-// app.use('/api/testimonials', require('./src/routes/testimonialRoutes'));
-// app.use('/api/blog', require('./src/routes/blogRoutes'));
-// app.use('/api/orders', require('./src/routes/orderRoutes'));
+app.use('/api/products', require('./src/routes/productRoutes'));
+app.use('/api/categories', require('./src/routes/categoryRoutes'));
+app.use('/api/gallery', require('./src/routes/galleryRoutes'));
+app.use('/api/testimonials', require('./src/routes/testimonialRoutes'));
+app.use('/api/blog', require('./src/routes/blogRoutes'));
+app.use('/api/orders', require('./src/routes/orderRoutes'));
 
 // Health check
 app.get('/', (req, res) => {
