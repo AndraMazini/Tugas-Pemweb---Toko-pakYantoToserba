@@ -88,7 +88,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
           <div>
             <div class="text-sm font-semibold text-slate-400 tracking-wide uppercase">Total Produk</div>
@@ -120,37 +120,114 @@
           </div>
           <div class="text-3xl bg-emerald-50 text-emerald-500 p-4 rounded-xl group-hover:scale-110 transition-transform duration-300">💬</div>
         </div>
+
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div>
+            <div class="text-sm font-semibold text-slate-400 tracking-wide uppercase">Artikel Blog</div>
+            <div class="text-3xl font-extrabold text-slate-800 mt-1 tracking-tight" id="stat-blog">-</div>
+          </div>
+          <div class="text-3xl bg-violet-50 text-violet-500 p-4 rounded-xl group-hover:scale-110 transition-transform duration-300">📝</div>
+        </div>
       </div>
 
       <div class="mt-12">
-        <h2 class="text-xl font-extrabold text-slate-800 tracking-tight mb-5">Akses Pintas Cepat</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
-          <a href="./produk.html" class="group bg-gradient-to-br from-orange-500 to-amber-500 text-white rounded-2xl p-5 text-center shadow-md shadow-orange-500/10 hover:shadow-xl hover:shadow-orange-500/20 hover:-translate-y-1 transition-all duration-300">
-            <div class="text-3xl mb-3 transform group-hover:scale-125 duration-300">📦</div>
-            <div class="font-bold text-sm tracking-wide">Kelola Produk</div>
-          </a>
-          <a href="./orders.html" class="group bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl p-5 text-center shadow-md shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300">
-            <div class="text-3xl mb-3 transform group-hover:scale-125 duration-300">📬</div>
-            <div class="font-bold text-sm tracking-wide">Lihat Orders</div>
-          </a>
-          <a href="./testimoni.html" class="group bg-gradient-to-br from-emerald-600 to-teal-600 text-white rounded-2xl p-5 text-center shadow-md shadow-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/20 hover:-translate-y-1 transition-all duration-300">
-            <div class="text-3xl mb-3 transform group-hover:scale-125 duration-300">💬</div>
-            <div class="font-bold text-sm tracking-wide">Ulas Testimoni</div>
-          </a>
-          <a href="./blog.html" class="group bg-gradient-to-br from-purple-600 to-fuchsia-600 text-white rounded-2xl p-5 text-center shadow-md shadow-purple-500/10 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-1 transition-all duration-300">
-            <div class="text-3xl mb-3 transform group-hover:scale-125 duration-300">📝</div>
-            <div class="font-bold text-sm tracking-wide">Tulis Artikel</div>
-          </a>
-          <a id="shortcut-superadmin" href="./tambah-admin.html" class="hidden group bg-gradient-to-br from-rose-600 to-red-700 text-white rounded-2xl p-5 text-center shadow-md shadow-rose-500/10 hover:shadow-xl hover:shadow-rose-500/20 hover:-translate-y-1 transition-all duration-300 col-span-2 sm:col-span-1">
-            <div class="text-3xl mb-3 transform group-hover:scale-125 duration-300">👥</div>
-            <div class="font-bold text-sm tracking-wide">Tambah Admin</div>
-          </a>
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Realtime Analytics</h2>
+            <p class="text-slate-500 text-sm mt-1 font-medium">Data dashboard sekarang terhubung langsung dengan halaman lain dan diperbarui otomatis.</p>
+          </div>
+          <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+            <span class="text-amber-500">✨</span>
+            Update setiap 10 detik
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <section class="xl:col-span-2 bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 hover:shadow-xl transition-all duration-300">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Grafik</p>
+                <h3 class="text-2xl font-extrabold text-slate-900">Performa Dashboard</h3>
+              </div>
+              <div class="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600">Realtime dengan data API</div>
+            </div>
+            <div class="rounded-[2rem] border border-slate-100 bg-slate-50 p-4">
+              <canvas id="dashboardChart" height="240"></canvas>
+            </div>
+            <div class="mt-5 grid grid-cols-2 gap-4 text-sm text-slate-500">
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="text-slate-800 font-semibold">Pesanan Selesai</div>
+                <div id="stat-finished-orders" class="text-2xl font-bold text-slate-900 mt-2">-</div>
+              </div>
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="text-slate-800 font-semibold">Pesanan Pending</div>
+                <div id="stat-pending-orders" class="text-2xl font-bold text-slate-900 mt-2">-</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Ringkasan</p>
+                <h3 class="text-2xl font-extrabold text-slate-900">Sinkronisasi Halaman</h3>
+              </div>
+              <div class="text-3xl">⚡</div>
+            </div>
+            <div class="space-y-4 text-sm text-slate-600">
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="font-semibold text-slate-900">Produk & Kategori</div>
+                <div class="text-slate-500 mt-1">Terintegrasi dengan halaman Produk dan Kategori.</div>
+              </div>
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="font-semibold text-slate-900">Orders</div>
+                <div class="text-slate-500 mt-1">Mengambil data langsung dari API Orders.</div>
+              </div>
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="font-semibold text-slate-900">Testimoni & Blog</div>
+                <div class="text-slate-500 mt-1">Jumlah pending testimoni dan artikel blog tersinkronasi.</div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <section class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Daftar Pesanan</p>
+                <h3 class="text-2xl font-extrabold text-slate-900">Pesanan Terbaru</h3>
+              </div>
+              <div class="text-3xl">🧾</div>
+            </div>
+            <div id="recent-orders" class="space-y-3 text-slate-700 text-sm">Memuat data pesanan...</div>
+          </section>
+
+          <section class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Pratinjau</p>
+                <h3 class="text-2xl font-extrabold text-slate-900">Statistik Halaman</h3>
+              </div>
+              <div class="text-3xl">👁️</div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 text-sm text-slate-600">
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="font-semibold text-slate-900">Konten Produk</div>
+                <div class="text-slate-500 mt-1">Terkoneksi ke halaman Produk, menampilkan jumlah item real-time.</div>
+              </div>
+              <div class="rounded-3xl bg-slate-50 p-4 border border-slate-100">
+                <div class="font-semibold text-slate-900">Konten Blog</div>
+                <div class="text-slate-500 mt-1">Jumlah artikel blog diperbarui dari endpoint Blog.</div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-      
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../js/api.js"></script>
   <script src="./js/dashboard.js"></script>
 </body>

@@ -5,7 +5,7 @@ const router = express.Router();
 let dummyOrders = [
   {
     id: "ORD-1024",
-    customer_name: "Yudi Goblok",
+    customer_name: "Yudi Punko",
     items: "Beras Pandan Wangi (2kg), Minyak Goreng Bimoli (1L)",
     total_price: 68000,
     status: "Pending",

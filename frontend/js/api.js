@@ -288,3 +288,22 @@ async function generateWaLink(id) {
   });
   return res.json();
 }
+
+// ... (Biarkan semua kode asli api.js milikmu di atas tetap seperti itu) ...
+
+async function generateWaLink(id) {
+  const res = await fetch(`${BASE_URL}/api/orders/generate-wa/${id}`, {
+    headers: authHeader()
+  });
+  return res.json();
+}
+
+// ─── ADDISIONAL REGISTER ACTION (TAMBAHAN BARU DI PALING BAWAH) ───
+async function register(name, email, password) {
+  const res = await fetch(`${BASE_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password })
+  });
+  return res.json();
+}

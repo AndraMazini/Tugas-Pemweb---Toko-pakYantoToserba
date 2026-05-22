@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 // Error handler (harus paling bawah)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });

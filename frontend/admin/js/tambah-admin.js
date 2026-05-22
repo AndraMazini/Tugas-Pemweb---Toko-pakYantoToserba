@@ -76,7 +76,7 @@ async function loadDataAdmin() {
   }
 }
 
-// 2. Eksekusi Kirim Data Pendaftaran Admin Baru
+// 2. SINKRONISASI: Jalur Registrasi dialihkan ke /api/auth/register-admin
 async function handleRegisterAdmin(e) {
   e.preventDefault();
 
@@ -91,7 +91,8 @@ async function handleRegisterAdmin(e) {
 
   try {
     const token = getToken();
-    const response = await fetch(`${BASE_URL}/api/auth/register`, {
+    // PERBAIKAN SINKRONISASI: Diubah dari /api/auth/register menjadi /api/auth/register-admin
+    const response = await fetch(`${BASE_URL}/api/auth/register-admin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ async function handleRegisterAdmin(e) {
     if (result.success) {
       alert(`Sukses mendaftarkan ${name}!`);
       document.getElementById('form-tambah-admin').reset();
-      loadDataAdmin(); // Auto-refresh isi tabel biar langsung muncul di bawah
+      loadDataAdmin(); // Segarkan isi tabel secara langsung
     } else {
       alert(result.message || 'Gagal mendaftarkan admin.');
     }
