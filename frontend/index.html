@@ -681,6 +681,7 @@
         <i class="bi bi-shop-window fs-4 text-warning"></i>
         <span>Toserba Pak Yanto</span>
       </a>
+<<<<<<< HEAD
 
       <div class="d-flex align-items-center gap-2 order-lg-3">
         <button class="icon-btn" id="darkModeToggle" type="button" title="Toggle dark mode">
@@ -711,6 +712,11 @@
       <div class="d-none d-lg-block">
         <a href="#kontak" class="btn btn-accent">Pesan Sekarang</a>
       </div>
+
+      <a id="admin-btn" href="/frontend/admin/dashboard.html" class="hidden bg-indigo-600 text-white text-sm px-4 py-2 rounded-full hover:bg-indigo-700 transition">
+        🔐 Admin Panel
+      </a>
+903f3cc (membuat panel admin dan membenari yang error)
     </div>
   </nav>
 
@@ -1162,10 +1168,24 @@
 
   <div class="toast-float" id="toastFloat">Mode tampilan diubah</div>
 
+<<<<<<< HEAD
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="./js/api.js"></script>
   <script src="./js/ui.js"></script>
   <script src="./js/form.js"></script>
   <script src="./js/main.js"></script>
+=======
+  <script src="js/api.js"></script>
+  <script src="js/index.js"></script>
+  <script>
+    // Tampilkan tombol admin jika user login sebagai admin
+    const adminBtn = document.getElementById('admin-btn');
+    const user = JSON.parse(localStorage.getItem('admin_user') || '{}');
+    
+    if (user && user.role && (user.role === 'admin' || user.role === 'superadmin')) {
+      adminBtn.classList.remove('hidden');
+    }
+  </script>
+>>>>>>> 903f3cc (membuat panel admin dan membenari yang error)
 </body>
 </html>
