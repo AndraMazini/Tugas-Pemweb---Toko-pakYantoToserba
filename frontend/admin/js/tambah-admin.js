@@ -43,9 +43,14 @@ async function loadDataAdmin() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const result = await response.json();
-    const admins = result.data || [];
+    const admins = (result.data || []).filter(staf => staf.role === 'admin' || staf.role === 'superadmin');
 
     tbody.innerHTML = '';
+    if (admins.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-slate-400">Tidak ada akun admin atau superadmin.</td></tr>`;
+      return;
+    }
+
     admins.forEach(staf => {
       // Logika Emote & Badge Warna Pembeda
       let roleBadge = '';

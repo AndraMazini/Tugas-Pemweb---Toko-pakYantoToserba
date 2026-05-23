@@ -18,6 +18,9 @@ const generateToken = (user) => {
 // POST /api/auth/register (Register User Baru)
 const register = async (req, res) => {
   const { name, email, password } = req.body;
+  
+  console.log('📝 Register attempt:', { name, email }); // Debug log
+  
   if (!name || !email || !password) {
     return res.status(400).json({ success: false, message: 'Semua field wajib diisi' });
   }
@@ -29,17 +32,19 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.execute(
       'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashedPassword, 'customer']
+      [name, email, hashedPassword, 'user']
     );
+
+    console.log('✅ User registered:', { id: result.insertId, name, email }); // Debug log
 
     res.status(201).json({
       success: true,
       message: 'Registrasi berhasil',
-      user: { id: result.insertId, name, email, role: 'customer' }
+      user: { id: result.insertId, name, email, role: 'user' }
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('❌ Register error:', err.message, err.code); // Debug log
+    res.status(500).json({ success: false, message: 'Server error: ' + err.message });
   }
 };
 
@@ -123,7 +128,10 @@ const registerAdmin = async (req, res) => {
 // GET /api/auth/users (Mengambil data pengelola manajemen toko)
 const getUsers = async (req, res) => {
   try {
-    const [rows] = await db.execute('SELECT id, name, email, role FROM users');
+    // Hanya ambil akun dengan role admin atau superadmin.
+    const [rows] = await db.execute(
+      "SELECT id, name, email, role FROM users WHERE role IN ('admin', 'superadmin')"
+    );
     res.json({ success: true, data: rows });
   } catch (err) {
     console.error(err);

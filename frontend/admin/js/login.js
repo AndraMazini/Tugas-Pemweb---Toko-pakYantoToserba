@@ -21,15 +21,14 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
     
     // Memanggil fungsi login dari api.js
     const result = await login(email, password);
-    
-    // Cek status response
-    if (!result.ok && result.status >= 400) {
-      errorDiv.innerText = result.message || 'Email atau password salah!';
+
+    if (!result || !result.success) {
+      errorDiv.innerText = result?.message || 'Email atau password salah!';
       errorDiv.classList.remove('hidden');
       return;
     }
-    
-    if (result.success || result.token) {
+
+    if (result.token) {
       const userRole = result.user?.role;
       if (userRole === 'admin' || userRole === 'superadmin') {
         saveToken(result.token); // Fungsi bawaan api.js

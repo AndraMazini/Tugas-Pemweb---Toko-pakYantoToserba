@@ -21,13 +21,13 @@ form.addEventListener('submit', async (e) => {
     const result = await response.json();
 
     if(result.success){
-      msg.textContent = 'Register akun berhasil! Mengalihkan ke Beranda...';
+      msg.textContent = 'Register akun berhasil! Mengalihkan ke halaman login...';
       msg.style.color = '#155724';
       msg.style.backgroundColor = '#d4edda';
 
-      // 🌟 PERBAIKAN REDIRECT: Langsung dilempar ke index.html tampilan user
+      // 🌟 PERBAIKAN REDIRECT: Langsung ke login page agar bisa login
       setTimeout(() => {
-        window.location.href = '../index.html';
+        window.location.href = './login.html';
       }, 1500);
 
     } else {

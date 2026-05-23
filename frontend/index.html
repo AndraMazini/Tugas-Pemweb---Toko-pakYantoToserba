@@ -25,6 +25,9 @@
       <a href="/kontak.html" class="bg-orange-600 text-white text-sm px-4 py-2 rounded-full hover:bg-orange-700 transition">
         💬 Hubungi Kami
       </a>
+      <a id="admin-btn" href="/frontend/admin/dashboard.html" class="hidden bg-indigo-600 text-white text-sm px-4 py-2 rounded-full hover:bg-indigo-700 transition">
+        🔐 Admin Panel
+      </a>
     </div>
   </nav>
 
@@ -230,5 +233,14 @@
 
   <script src="js/api.js"></script>
   <script src="js/index.js"></script>
+  <script>
+    // Tampilkan tombol admin jika user login sebagai admin
+    const adminBtn = document.getElementById('admin-btn');
+    const user = JSON.parse(localStorage.getItem('admin_user') || '{}');
+    
+    if (user && user.role && (user.role === 'admin' || user.role === 'superadmin')) {
+      adminBtn.classList.remove('hidden');
+    }
+  </script>
 </body>
 </html>
