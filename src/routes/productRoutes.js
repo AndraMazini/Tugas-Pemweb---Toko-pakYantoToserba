@@ -1,71 +1,248 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../config/db');
 
-// Data Dummy Produk agar Frontend bisa menampilkan data sementara
-const dummyProducts = [
-  {
-    id: "prod-1",
-    name: "Beras Pandan Wangi Super 5kg",
-    price: 78000,
-    stock: 25,
-    category_name: "Sembako",
-    category_id: "cat-1",
-    image_url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=200&auto=format&fit=crop",
-    description: "Beras pilihan keluarga Pak Yanto, pulen murni tanpa pemutih buatan."
-  },
-  {
-    id: "prod-2",
-    name: "Minyak Goreng Bimoli 2 Liter",
-    price: 36500,
-    stock: 4,
-    category_name: "Kebutuhan Dapur",
-    category_id: "cat-2",
-    image_url: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=200&auto=format&fit=crop",
-    description: "Minyak goreng kelapa sawit berkualitas tinggi, panasnya merata."
-  },
-  {
-    id: "prod-3",
-    name: "Indomie Goreng Spesial (Per Dus)",
-    price: 112000,
-    stock: 15,
-    category_name: "Makanan Instan",
-    category_id: "cat-3",
-    image_url: "https://images.unsplash.com/photo-1612927601601-6638404737ce?q=80&w=200&auto=format&fit=crop",
-    description: "Satu dus isi 40 pcs. Stok wajib untuk anak kos dan rumahtangga."
+// [GET] /api/products
+router.get('/', async (req, res) => {
+  try {
+    const { category = '', limit = 10 } = req.query;
+
+    let sql = `
+      SELECT
+        p.id,
+        p.name,
+        p.slug,
+        p.description,
+        p.price_range,
+        p.image_url,
+        p.is_featured,
+        p.badge,
+        p.category_id,
+        p.created_at,
+        c.name AS category_name,
+        c.slug AS category_slug
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+    `;
+
+    const params = [];
+
+    if (category) {
+      sql += ` WHERE c.slug = ? `;
+      params.push(category);
+    }
+
+    sql += ` ORDER BY p.id DESC LIMIT ? `;
+    params.push(Number(limit));
+
+    const [rows] = await db.query(sql, params);
+
+    res.status(200).json({
+      success: true,
+      message: 'Berhasil mengambil daftar produk',
+      data: rows,
+      pagination: {
+        currentPage: 1,
+        pageSize: Number(limit),
+        totalItems: rows.length,
+        totalPages: 1
+      }
+    });
+  } catch (error) {
+    console.error('GET /api/products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data produk',
+      error: error.message
+    });
   }
-];
-
-// [GET] http://localhost:3000/api/products
-// Rute untuk mengambil semua data produk ke tabel frontend
-router.get('/', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Berhasil mengambil data produk dummy",
-    data: dummyProducts
-  });
 });
 
-// [POST] http://localhost:3000/api/products
-// Rute penampung ketika tombol "Simpan Barang" di modal diklik
-router.post('/', (req, res) => {
-  const { name, price, stock, category_id, image_url, description } = req.body;
-  
-  // Simulasi sukses menyimpan data ke database
-  res.status(201).json({
-    success: true,
-    message: `Produk "${name}" berhasil didaftarkan ke sistem database!`
-  });
+// [GET] /api/products/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const sql = `
+      SELECT
+        p.id,
+        p.name,
+        p.slug,
+        p.description,
+        p.price_range,
+        p.image_url,
+        p.is_featured,
+        p.badge,
+        p.category_id,
+        p.created_at,
+        c.name AS category_name,
+        c.slug AS category_slug
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.id = ?
+      LIMIT 1
+    `;
+
+    const [rows] = await db.query(sql, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Produk tidak ditemukan'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Berhasil mengambil detail produk',
+      data: rows[0]
+    });
+  } catch (error) {
+    console.error('GET /api/products/:id error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil detail produk',
+      error: error.message
+    });
+  }
 });
 
-// [DELETE] http://localhost:3000/api/products/:id
-// Rute penampung ketika tombol "Hapus" diklik
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  
-  res.status(200).json({
-    success: true,
-    message: `Produk dengan ID ${id} berhasil dihapus dari sistem.`
-  });
+// [POST] /api/products
+router.post('/', async (req, res) => {
+  try {
+    const {
+      category_id,
+      name,
+      slug,
+      description,
+      price_range,
+      image_url,
+      is_featured = false,
+      badge = null
+    } = req.body;
+
+    const sql = `
+      INSERT INTO products
+      (category_id, name, slug, description, price_range, image_url, is_featured, badge)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await db.query(sql, [
+      category_id,
+      name,
+      slug,
+      description,
+      price_range,
+      image_url,
+      is_featured ? 1 : 0,
+      badge
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: 'Produk berhasil ditambahkan',
+      data: {
+        id: result.insertId
+      }
+    });
+  } catch (error) {
+    console.error('POST /api/products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal menambahkan produk',
+      error: error.message
+    });
+  }
+});
+
+// [PUT] /api/products/:id
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      category_id,
+      name,
+      slug,
+      description,
+      price_range,
+      image_url,
+      is_featured = false,
+      badge = null
+    } = req.body;
+
+    const sql = `
+      UPDATE products
+      SET
+        category_id = ?,
+        name = ?,
+        slug = ?,
+        description = ?,
+        price_range = ?,
+        image_url = ?,
+        is_featured = ?,
+        badge = ?
+      WHERE id = ?
+    `;
+
+    const [result] = await db.query(sql, [
+      category_id,
+      name,
+      slug,
+      description,
+      price_range,
+      image_url,
+      is_featured ? 1 : 0,
+      badge,
+      id
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Produk tidak ditemukan'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Produk berhasil diperbarui'
+    });
+  } catch (error) {
+    console.error('PUT /api/products/:id error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui produk',
+      error: error.message
+    });
+  }
+});
+
+// [DELETE] /api/products/:id
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await db.query('DELETE FROM products WHERE id = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Produk tidak ditemukan'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Produk berhasil dihapus'
+    });
+  } catch (error) {
+    console.error('DELETE /api/products/:id error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal menghapus produk',
+      error: error.message
+    });
+  }
 });
 
 module.exports = router;

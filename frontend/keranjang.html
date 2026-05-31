@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keranjang | Toserba Pak Yanto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      color: #132238;
+      padding: 40px 0;
+    }
+
+    .soft-card {
+      background: #fff;
+      border: 1px solid #e7edf4;
+      border-radius: 18px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 12px 30px rgba(15, 39, 71, 0.08);
+    }
+
+    .btn-accent {
+      background: #f59e0b;
+      border: 1px solid #f59e0b;
+      color: #fff;
+      font-weight: 700;
+      border-radius: 12px;
+    }
+
+    .btn-accent:hover {
+      background: #d97706;
+      border-color: #d97706;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <h1 class="fw-bold mb-1">Keranjang Belanja</h1>
+        <p class="text-muted mb-0">Periksa kembali barang yang ingin kamu pesan.</p>
+      </div>
+      <a href="katalog.html" class="btn btn-outline-secondary">← Kembali ke Katalog</a>
+    </div>
+
+    <div id="cartList" class="row g-4"></div>
+
+    <div class="mt-4 d-flex flex-wrap gap-2">
+      <button class="btn btn-accent" id="checkoutWA">
+        <i class="bi bi-whatsapp me-2"></i>Checkout via WhatsApp
+      </button>
+      <button class="btn btn-outline-danger" id="clearCartBtn">
+        <i class="bi bi-trash me-2"></i>Kosongkan Keranjang
+      </button>
+    </div>
+  </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/cart.js"></script>
+  <script src="./js/checkout.js"></script>
+</body>
+</html>

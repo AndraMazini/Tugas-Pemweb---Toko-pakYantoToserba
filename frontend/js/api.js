@@ -1,309 +1,323 @@
 // ============================================================
-//  api.js — JANGAN DIUBAH TANPA KOORDINASI
-//  File ini dipakai bersama oleh landing page & admin panel
+// api.js — versi rapi untuk frontend user + admin
 // ============================================================
 
-// Disesuaikan ke port backend Node.js 5000 yang sedang berjalan aktif
-const BASE_URL = 'http://localhost:5000'; 
+const BASE_URL = "http://localhost:5000";
 
-// ─── HELPER ─────────────────────────────────────────────────
+// ─── TOKEN & AUTH ────────────────────────────────────────────
 function getToken() {
-  return localStorage.getItem('admin_token');
+  return localStorage.getItem("admin_token");
 }
 
 function saveToken(token) {
-  localStorage.setItem('admin_token', token);
+  localStorage.setItem("admin_token", token);
 }
 
 function removeToken() {
-  localStorage.removeItem('admin_token');
-  localStorage.removeItem('admin_user');
+  localStorage.removeItem("admin_token");
+  localStorage.removeItem("admin_user");
 }
 
 function isLoggedIn() {
   return !!getToken();
 }
 
+function authHeader(isJson = true) {
+  const headers = {
+    Authorization: `Bearer ${getToken()}`
+  };
+
+  if (isJson) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
+}
+
+function logout() {
+  removeToken();
+  window.location.href = "login.html";
+}
+
+// ─── HELPER ──────────────────────────────────────────────────
 function getImageUrl(path) {
-  if (!path) return '/assets/images/placeholder.jpg';
-  return `${BASE_URL}${path}`;
+  if (!path) {
+    return "https://via.placeholder.com/600x400?text=No+Image";
+  }
+
+  if (typeof path === "string" && path.startsWith("data:image/")) {
+    return path;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  let p = String(path).replace(/\\/g, "/");
+  p = p.replace(/(^\/*)?src\//i, "");
+
+  if (p.startsWith("/")) {
+    return `${BASE_URL}${p}`;
+  }
+
+  if (p.startsWith("uploads/")) {
+    return `${BASE_URL}/${p}`;
+  }
+
+  return `${BASE_URL}/${p.replace(/^\//, "")}`;
 }
 
 function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('id-ID', {
-    day: 'numeric', month: 'long', year: 'numeric'
+  if (!dateStr) return "-";
+
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "-";
+
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
   });
 }
 
-function authHeader() {
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${getToken()}`
-  };
+function buildQuery(params = {}) {
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      query.append(key, value);
+    }
+  });
+
+  const queryString = query.toString();
+  return queryString ? `?${queryString}` : "";
 }
 
-// ─── GLOBAL AUTH ACTIONS ─────────────────────────────────────
-function logout() {
-  removeToken();
-  // Jalur aman relatif dari subfolder admin maupun landing page utama
-  window.location.href = 'login.html'; 
+async function safeFetch(url, options = {}) {
+  const res = await fetch(url, options);
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Terjadi kesalahan pada server");
+  }
+
+  return data;
 }
 
 // ─── AUTH ────────────────────────────────────────────────────
 async function login(email, password) {
-  const res = await fetch(`${BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  return await safeFetch(`${BASE_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
   });
-  return res.json();
+}
+
+async function register(name, email, password) {
+  return await safeFetch(`${BASE_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password })
+  });
 }
 
 async function getMe() {
-  const res = await fetch(`${BASE_URL}/api/auth/me`, {
+  return await safeFetch(`${BASE_URL}/api/auth/me`, {
     headers: authHeader()
   });
-  return res.json();
 }
 
 // ─── KATEGORI ────────────────────────────────────────────────
 async function getCategories() {
-  const res = await fetch(`${BASE_URL}/api/categories`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/categories`);
 }
 
 async function createCategory(data) {
-  const res = await fetch(`${BASE_URL}/api/categories`, {
-    method: 'POST',
+  return await safeFetch(`${BASE_URL}/api/categories`, {
+    method: "POST",
     headers: authHeader(),
     body: JSON.stringify(data)
   });
-  return res.json();
 }
 
 async function updateCategory(id, data) {
-  const res = await fetch(`${BASE_URL}/api/categories/${id}`, {
-    method: 'PUT',
+  return await safeFetch(`${BASE_URL}/api/categories/${id}`, {
+    method: "PUT",
     headers: authHeader(),
     body: JSON.stringify(data)
   });
-  return res.json();
 }
 
 async function deleteCategory(id) {
-  const res = await fetch(`${BASE_URL}/api/categories/${id}`, {
-    method: 'DELETE',
+  return await safeFetch(`${BASE_URL}/api/categories/${id}`, {
+    method: "DELETE",
     headers: authHeader()
   });
-  return res.json();
 }
 
 // ─── PRODUK ──────────────────────────────────────────────────
 async function getProducts(params = {}) {
-  const query = new URLSearchParams(params).toString();
-  const res = await fetch(`${BASE_URL}/api/products${query ? '?' + query : ''}`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/products${buildQuery(params)}`);
 }
 
 async function getProductById(id) {
-  const res = await fetch(`${BASE_URL}/api/products/${id}`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/products/${id}`);
 }
 
 async function createProduct(formData) {
-  const res = await fetch(`${BASE_URL}/api/products`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${getToken()}` },
-    body: formData  
+  const isFormData = typeof FormData !== "undefined" && formData instanceof FormData;
+
+  return await safeFetch(`${BASE_URL}/api/products`, {
+    method: "POST",
+    headers: isFormData ? { Authorization: `Bearer ${getToken()}` } : authHeader(),
+    body: isFormData ? formData : JSON.stringify(formData)
   });
-  return res.json();
 }
 
 async function updateProduct(id, formData) {
-  const res = await fetch(`${BASE_URL}/api/products/${id}`, {
-    method: 'PUT',
-    headers: { 'Authorization': `Bearer ${getToken()}` },
-    body: formData
+  const isFormData = typeof FormData !== "undefined" && formData instanceof FormData;
+
+  return await safeFetch(`${BASE_URL}/api/products/${id}`, {
+    method: "PUT",
+    headers: isFormData ? { Authorization: `Bearer ${getToken()}` } : authHeader(),
+    body: isFormData ? formData : JSON.stringify(formData)
   });
-  return res.json();
 }
 
 async function deleteProduct(id) {
-  const res = await fetch(`${BASE_URL}/api/products/${id}`, {
-    method: 'DELETE',
+  return await safeFetch(`${BASE_URL}/api/products/${id}`, {
+    method: "DELETE",
     headers: authHeader()
   });
-  return res.json();
 }
 
 // ─── GALERI ──────────────────────────────────────────────────
 async function getGallery() {
-  const res = await fetch(`${BASE_URL}/api/gallery`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/gallery`);
 }
 
 async function createGallery(formData) {
-  const res = await fetch(`${BASE_URL}/api/gallery`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${getToken()}` },
+  return await safeFetch(`${BASE_URL}/api/gallery`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${getToken()}` },
     body: formData
   });
-  return res.json();
 }
 
 async function deleteGallery(id) {
-  const res = await fetch(`${BASE_URL}/api/gallery/${id}`, {
-    method: 'DELETE',
+  return await safeFetch(`${BASE_URL}/api/gallery/${id}`, {
+    method: "DELETE",
     headers: authHeader()
   });
-  return res.json();
 }
 
 // ─── TESTIMONI ───────────────────────────────────────────────
 async function getTestimonials() {
-  const res = await fetch(`${BASE_URL}/api/testimonials`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/testimonials`);
 }
 
 async function getAllTestimonials() {
-  const res = await fetch(`${BASE_URL}/api/testimonials/all`, {
+  return await safeFetch(`${BASE_URL}/api/testimonials/all`, {
     headers: authHeader()
   });
-  return res.json();
 }
 
 async function submitTestimonial(data) {
-  const res = await fetch(`${BASE_URL}/api/testimonials`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  return await safeFetch(`${BASE_URL}/api/testimonials`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
-  return res.json();
 }
 
 async function approveTestimonial(id) {
-  const res = await fetch(`${BASE_URL}/api/testimonials/${id}/approve`, {
-    method: 'PUT',
+  return await safeFetch(`${BASE_URL}/api/testimonials/${id}/approve`, {
+    method: "PUT",
     headers: authHeader()
   });
-  return res.json();
 }
 
 async function rejectTestimonial(id) {
-  const res = await fetch(`${BASE_URL}/api/testimonials/${id}/reject`, {
-    method: 'PUT',
+  return await safeFetch(`${BASE_URL}/api/testimonials/${id}/reject`, {
+    method: "PUT",
     headers: authHeader()
   });
-  return res.json();
 }
 
 // ─── BLOG ────────────────────────────────────────────────────
 async function getBlogPosts(params = {}) {
-  const query = new URLSearchParams(params).toString();
-  const res = await fetch(`${BASE_URL}/api/blog${query ? '?' + query : ''}`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/blog${buildQuery(params)}`);
 }
 
 async function getAllBlogPosts() {
-  const res = await fetch(`${BASE_URL}/api/blog/all`, {
+  return await safeFetch(`${BASE_URL}/api/blog/all`, {
     headers: authHeader()
   });
-  return res.json();
 }
 
 async function getBlogBySlug(slug) {
-  const res = await fetch(`${BASE_URL}/api/blog/${slug}`);
-  return res.json();
+  return await safeFetch(`${BASE_URL}/api/blog/${slug}`);
 }
 
 async function createBlogPost(formData) {
-  const res = await fetch(`${BASE_URL}/api/blog`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${getToken()}` },
+  return await safeFetch(`${BASE_URL}/api/blog`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${getToken()}` },
     body: formData
   });
-  return res.json();
 }
 
 async function updateBlogPost(id, formData) {
-  const res = await fetch(`${BASE_URL}/api/blog/${id}`, {
-    method: 'PUT',
-    headers: { 'Authorization': `Bearer ${getToken()}` },
+  return await safeFetch(`${BASE_URL}/api/blog/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${getToken()}` },
     body: formData
   });
-  return res.json();
 }
 
 async function deleteBlogPost(id) {
-  const res = await fetch(`${BASE_URL}/api/blog/${id}`, {
-    method: 'DELETE',
+  return await safeFetch(`${BASE_URL}/api/blog/${id}`, {
+    method: "DELETE",
     headers: authHeader()
   });
-  return res.json();
 }
 
 // ─── ORDER ───────────────────────────────────────────────────
 async function submitOrder(data) {
-  const res = await fetch(`${BASE_URL}/api/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  return await safeFetch(`${BASE_URL}/api/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
-  return res.json();
 }
 
 async function getAllOrders(params = {}) {
-  const query = new URLSearchParams(params).toString();
-  const res = await fetch(`${BASE_URL}/api/orders${query ? '?' + query : ''}`, {
-    headers: authHeader()
+  return await safeFetch(`${BASE_URL}/api/orders${buildQuery(params)}`, {
+    headers: authHeader(false)
   });
-  return res.json();
 }
 
-// Jembatan / Alias fungsi agar orders.html dan orders.js tidak error mencari fungsi getOrders
 async function getOrders() {
-  return getAllOrders();
+  return await getAllOrders();
 }
 
 async function updateOrderStatus(id, status) {
-  const res = await fetch(`${BASE_URL}/api/orders/${id}/status`, {
-    method: 'PUT',
+  return await safeFetch(`${BASE_URL}/api/orders/${id}/status`, {
+    method: "PUT",
     headers: authHeader(),
     body: JSON.stringify({ status })
   });
-  return res.json();
 }
 
 async function deleteOrder(id) {
-  const res = await fetch(`${BASE_URL}/api/orders/${id}`, {
-    method: 'DELETE',
-    headers: authHeader()
+  return await safeFetch(`${BASE_URL}/api/orders/${id}`, {
+    method: "DELETE",
+    headers: authHeader(false)
   });
-  return res.json();
 }
 
 async function generateWaLink(id) {
-  const res = await fetch(`${BASE_URL}/api/orders/generate-wa/${id}`, {
-    headers: authHeader()
+  return await safeFetch(`${BASE_URL}/api/orders/generate-wa/${id}`, {
+    headers: authHeader(false)
   });
-  return res.json();
-}
-
-// ... (Biarkan semua kode asli api.js milikmu di atas tetap seperti itu) ...
-
-async function generateWaLink(id) {
-  const res = await fetch(`${BASE_URL}/api/orders/generate-wa/${id}`, {
-    headers: authHeader()
-  });
-  return res.json();
-}
-
-// ─── ADDISIONAL REGISTER ACTION (TAMBAHAN BARU DI PALING BAWAH) ───
-async function register(name, email, password) {
-  const res = await fetch(`${BASE_URL}/api/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password })
-  });
-  return res.json();
 }
