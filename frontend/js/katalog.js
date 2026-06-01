@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   await initKatalogPage();
+  initCartBadgeKatalog();
 });
 
 let allProducts = [];
@@ -27,6 +28,40 @@ async function initKatalogPage() {
   }
 }
 
+function initCartBadgeKatalog() {
+  updateCartBadgeKatalog();
+
+  const modeToggleKatalog = document.getElementById("modeToggleKatalog");
+  const body = document.body;
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark") {
+    body.classList.add("dark");
+    if (modeToggleKatalog) {
+      modeToggleKatalog.innerHTML = '<i class="bi bi-sun-fill"></i>';
+    }
+  }
+
+  modeToggleKatalog?.addEventListener("click", () => {
+    body.classList.toggle("dark");
+    const isDark = body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    modeToggleKatalog.innerHTML = isDark
+      ? '<i class="bi bi-sun-fill"></i>'
+      : '<i class="bi bi-moon-stars-fill"></i>';
+  });
+
+  const hamburgerKatalog = document.getElementById("hamburgerKatalog");
+  const mobileNavKatalog = document.getElementById("mobileNavKatalog");
+
+  hamburgerKatalog?.addEventListener("click", () => {
+    mobileNavKatalog?.classList.toggle("open");
+  });
+}
+
+// =========================
+// DATA
+// =========================
 async function loadCategories() {
   try {
     const res = await getCategories();
@@ -57,13 +92,35 @@ function normalizeSlug(text = "") {
     .replace(/-+/g, "-");
 }
 
+function resolveCategoryAlias(slug = "") {
+  const normalized = normalizeSlug(slug);
+
+  const aliasMap = {
+    "peralatan-dapur": "kebutuhan-dapur",
+    "kebutuhan-dapur": "kebutuhan-dapur",
+
+    "peralatan-rumah-tangga": "peralatan-rumah-tangga",
+    "rumah-tangga": "peralatan-rumah-tangga",
+
+    "plastik-wadah": "plastik-dan-wadah",
+    "plastik-dan-wadah": "plastik-dan-wadah",
+
+    "makanan-instan": "makanan-instan",
+    "makanan instan": "makanan-instan",
+
+    "sembako": "sembako",
+    "kebersihan": "kebersihan"
+  };
+
+  return aliasMap[normalized] || normalized;
+}
+
 function normalizeCategoryData() {
-  // Rapikan data produk
   allProducts = allProducts.map((product) => {
     const categoryName = product.category_name || "";
-    const categorySlug =
-      product.category_slug ||
-      normalizeSlug(categoryName);
+    const categorySlug = resolveCategoryAlias(
+      product.category_slug || normalizeSlug(categoryName)
+    );
 
     return {
       ...product,
@@ -73,11 +130,12 @@ function normalizeCategoryData() {
     };
   });
 
-  // Jika kategori dari API kosong / tidak lengkap, ambil dari produk
   const categoriesFromProducts = new Map();
 
   allProducts.forEach((product) => {
-    const slug = product.category_slug || normalizeSlug(product.category_name);
+    const slug = resolveCategoryAlias(
+      product.category_slug || normalizeSlug(product.category_name)
+    );
     const name = product.category_name || slug || "Kategori";
 
     if (!slug) return;
@@ -92,7 +150,7 @@ function normalizeCategoryData() {
   const categoriesFromApi = new Map();
 
   allCategories.forEach((cat) => {
-    const slug = cat.slug || normalizeSlug(cat.name);
+    const slug = resolveCategoryAlias(cat.slug || normalizeSlug(cat.name));
     if (!slug) return;
 
     categoriesFromApi.set(slug, {
@@ -102,7 +160,6 @@ function normalizeCategoryData() {
     });
   });
 
-  // Gabungkan: API prioritas, tapi produk melengkapi yang hilang
   categoriesFromProducts.forEach((value, key) => {
     if (!categoriesFromApi.has(key)) {
       categoriesFromApi.set(key, value);
@@ -118,13 +175,14 @@ function normalizeCategoryData() {
 function bindInitialFilterFromURL() {
   const params = new URLSearchParams(window.location.search);
   const category = params.get("category");
+
   if (category) {
-    activeCategory = normalizeSlug(category);
+    activeCategory = resolveCategoryAlias(category);
   }
 }
 
 function setActiveCategory(slug = "") {
-  activeCategory = normalizeSlug(slug);
+  activeCategory = resolveCategoryAlias(slug);
   currentPage = 1;
 
   const nextUrl = activeCategory
@@ -142,13 +200,62 @@ function filterKategori(slug = "") {
 function getFilteredProducts() {
   if (!activeCategory) return allProducts;
 
-  return allProducts.filter((product) => {
-    const pSlug = normalizeSlug(product.category_slug || "");
-    const pName = normalizeSlug(product.category_name || "");
-    const active = normalizeSlug(activeCategory);
+  const active = resolveCategoryAlias(activeCategory);
 
+  return allProducts.filter((product) => {
+    const pSlug = resolveCategoryAlias(product.category_slug || "");
+    const pName = resolveCategoryAlias(product.category_name || "");
     return pSlug === active || pName === active;
   });
+}
+
+// =========================
+// CART BADGE + TOAST
+// =========================
+function updateCartBadgeKatalog() {
+  if (typeof getCartCount !== "function") return;
+
+  const count = getCartCount();
+
+  const badge = document.getElementById("cartBadge");
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? "inline-flex" : "none";
+  }
+
+  const mobileBadge = document.getElementById("cartBadgeMobile");
+  if (mobileBadge) {
+    mobileBadge.textContent = `(${count})`;
+  }
+}
+
+function showCartToast(message) {
+  const toast = document.getElementById("cartToast");
+  if (!toast) {
+    alert(message);
+    return;
+  }
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
+function handleAddToCartFromButton(btn) {
+  const product = {
+    id: btn.dataset.id,
+    name: btn.dataset.name,
+    price_range: btn.dataset.price,
+    image_url: btn.dataset.image,
+    category_name: btn.dataset.category
+  };
+
+  addToCart(product);
+  updateCartBadgeKatalog();
+  showCartToast(`${product.name} ditambahkan ke keranjang`);
 }
 
 // =========================
@@ -164,14 +271,29 @@ function renderCategoryButtons() {
   const container = document.getElementById("filter-kategori");
   if (!container) return;
 
+  const seen = new Set();
+  const cleanCategories = allCategories
+    .map((cat) => {
+      const safeSlug = resolveCategoryAlias(cat.slug || cat.name || "");
+      return {
+        ...cat,
+        safeSlug
+      };
+    })
+    .filter((cat) => {
+      if (!cat.safeSlug || seen.has(cat.safeSlug)) return false;
+      seen.add(cat.safeSlug);
+      return true;
+    });
+
   const buttonsHtml = `
     <button class="filter-btn ${activeCategory === "" ? "active" : ""}" data-category="">
       Semua
     </button>
-    ${allCategories.map(cat => `
+    ${cleanCategories.map(cat => `
       <button
-        class="filter-btn ${normalizeSlug(cat.slug) === normalizeSlug(activeCategory) ? "active" : ""}"
-        data-category="${escapeHtml(cat.slug)}">
+        class="filter-btn ${cat.safeSlug === resolveCategoryAlias(activeCategory) ? "active" : ""}"
+        data-category="${escapeHtml(cat.safeSlug)}">
         ${escapeHtml(cat.name)}
       </button>
     `).join("")}
@@ -234,10 +356,17 @@ function renderProducts() {
         </div>
 
         <div class="prod-actions">
-          <a href="index.html#kontak" class="btn-prod">
-            <i class="bi bi-bag-check-fill"></i>
-            Tanya Produk
-          </a>
+          <button
+            class="btn-prod"
+            data-id="${escapeHtml(product.id)}"
+            data-name="${escapeHtml(product.name || "")}"
+            data-price="${escapeHtml(product.price_range || "")}"
+            data-image="${escapeHtml(product.image_url || "")}"
+            data-category="${escapeHtml(product.category_name || "")}"
+            onclick="handleAddToCartFromButton(this)">
+            <i class="bi bi-cart-plus-fill"></i>
+            Tambah ke Keranjang
+          </button>
 
           <a
             href="https://wa.me/6282312740855?text=${encodeURIComponent(buildWhatsAppMessage(product))}"
@@ -320,12 +449,12 @@ function buildWhatsAppMessage(product) {
 }
 
 function getFallbackImageByCategory(categoryName = "", categorySlug = "") {
-  const slug = normalizeSlug(categorySlug || categoryName);
+  const slug = resolveCategoryAlias(categorySlug || categoryName);
 
   if (slug === "sembako") {
     return "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1200&auto=format&fit=crop";
   }
-  if (slug === "kebutuhan-dapur" || slug === "peralatan-dapur") {
+  if (slug === "kebutuhan-dapur") {
     return "https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1200&auto=format&fit=crop";
   }
   if (slug === "makanan-instan") {
@@ -334,8 +463,11 @@ function getFallbackImageByCategory(categoryName = "", categorySlug = "") {
   if (slug === "kebersihan") {
     return "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop";
   }
-  if (slug === "rumah-tangga" || slug === "peralatan-rumah-tangga") {
+  if (slug === "peralatan-rumah-tangga") {
     return "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop";
+  }
+  if (slug === "plastik-dan-wadah") {
+    return "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?q=80&w=1200&auto=format&fit=crop";
   }
 
   return "https://via.placeholder.com/600x400?text=No+Image";
@@ -352,7 +484,9 @@ function getFallbackImageByProduct(productName = "", categoryName = "", category
     "gula pasir 1kg": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=1200&auto=format&fit=crop",
     "tepung terigu 1kg": "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=1200&auto=format&fit=crop",
     "telur ayam 1kg": "https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=1200&auto=format&fit=crop",
-    "indomie goreng spesial (per dus)": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?q=80&w=1200&auto=format&fit=crop"
+    "indomie goreng spesial (per dus)": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?q=80&w=1200&auto=format&fit=crop",
+    "mie sedaap soto 1 dus": "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=1200&auto=format&fit=crop",
+    "pop mie ayam": "https://images.unsplash.com/photo-1626808642875-0aa545482dfb?q=80&w=1200&auto=format&fit=crop"
   };
 
   if (imageByProduct[name]) {

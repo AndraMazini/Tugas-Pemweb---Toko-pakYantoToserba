@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initInquiryFormWhatsApp();
   initReviewForm();
   initRoleUI();
+  updateCartBadge();
 
   await loadKategori();
   await loadProdukPilihan();
@@ -12,39 +13,55 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadBlogPreview();
   await loadTestimoni();
   await loadStats();
+
+  initRevealOnScroll();
 });
 
 function showToast(message) {
   const toast = document.getElementById("toastFloat");
-  if (!toast) return;
+  if (!toast) {
+    alert(message);
+    return;
+  }
 
-  toast.innerText = message;
-  toast.style.display = "block";
+  toast.textContent = message;
+  toast.classList.add("show");
 
   setTimeout(() => {
-    toast.style.display = "none";
-  }, 2000);
+    toast.classList.remove("show");
+  }, 2200);
 }
 
 function initDarkMode() {
   const body = document.body;
-  const toggle = document.getElementById("darkModeToggle");
+  const toggle = document.getElementById("modeToggle");
   const savedTheme = localStorage.getItem("theme");
 
   if (savedTheme === "dark") {
-    body.classList.add("dark-mode");
+    body.classList.add("dark");
     if (toggle) toggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+  } else {
+    body.classList.remove("dark");
+    if (toggle) toggle.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
   }
 
   toggle?.addEventListener("click", () => {
-    body.classList.toggle("dark-mode");
-    const isDark = body.classList.contains("dark-mode");
+    body.classList.toggle("dark");
+    const isDark = body.classList.contains("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
+
     toggle.innerHTML = isDark
       ? '<i class="bi bi-sun-fill"></i>'
       : '<i class="bi bi-moon-stars-fill"></i>';
 
     showToast(isDark ? "Mode gelap diaktifkan" : "Mode terang diaktifkan");
+  });
+
+  const hamburger = document.getElementById("hamburger");
+  const mobileNav = document.getElementById("mobileNav");
+
+  hamburger?.addEventListener("click", () => {
+    mobileNav?.classList.toggle("open");
   });
 }
 
@@ -67,22 +84,17 @@ function initInstantAnchorScroll() {
 
       window.scrollTo({
         top: topPos,
-        behavior: "auto"
+        behavior: "smooth"
       });
 
-      const navbarCollapse = document.getElementById("navbarNav");
-      if (navbarCollapse && navbarCollapse.classList.contains("show")) {
-        const bsCollapse =
-          bootstrap.Collapse.getInstance(navbarCollapse) ||
-          new bootstrap.Collapse(navbarCollapse, { toggle: false });
-        bsCollapse.hide();
-      }
+      const mobileNav = document.getElementById("mobileNav");
+      mobileNav?.classList.remove("open");
     });
   });
 }
 
 function initNavbarActiveState() {
-  const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"], .mobile-nav a[href^="#"]');
   const sections = document.querySelectorAll("section[id]");
 
   function updateActiveLink() {
@@ -107,6 +119,20 @@ function initNavbarActiveState() {
 
   updateActiveLink();
   window.addEventListener("scroll", updateActiveLink);
+}
+
+function initRevealOnScroll() {
+  const items = document.querySelectorAll(".fade-in");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  }, { threshold: 0.12 });
+
+  items.forEach(item => observer.observe(item));
 }
 
 function initRoleUI() {
@@ -152,17 +178,54 @@ function initRoleUI() {
   }
 }
 
+function normalizeSlug(text = "") {
+  return String(text || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "dan")
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function resolveCategoryAlias(slug = "") {
+  const normalized = normalizeSlug(slug);
+
+  const aliasMap = {
+    "peralatan-dapur": "kebutuhan-dapur",
+    "kebutuhan-dapur": "kebutuhan-dapur",
+
+    "peralatan-rumah-tangga": "peralatan-rumah-tangga",
+    "rumah-tangga": "peralatan-rumah-tangga",
+
+    "plastik-wadah": "plastik-dan-wadah",
+    "plastik-dan-wadah": "plastik-dan-wadah",
+
+    "makanan-instan": "makanan-instan",
+    "makanan instan": "makanan-instan",
+
+    "sembako": "sembako",
+    "kebersihan": "kebersihan"
+  };
+
+  return aliasMap[normalized] || normalized;
+}
+
+function getSafeCategorySlug(cat) {
+  return resolveCategoryAlias(cat?.slug || cat?.name || "");
+}
+
 function getFallbackImageByCategory(categoryName = "", categorySlug = "") {
-  const slug = String(categorySlug || "").toLowerCase();
+  const slug = resolveCategoryAlias(categorySlug || categoryName);
   const name = String(categoryName || "").toLowerCase();
 
   if (slug === "sembako" || name === "sembako") {
     return "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1200&auto=format&fit=crop";
   }
-  if (slug === "peralatan-dapur" || name === "peralatan dapur") {
+  if (slug === "kebutuhan-dapur") {
     return "https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1200&auto=format&fit=crop";
   }
-  if (slug === "peralatan-rumah-tangga" || name === "peralatan rumah tangga") {
+  if (slug === "peralatan-rumah-tangga") {
     return "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop";
   }
   if (slug === "kebersihan" || name === "kebersihan") {
@@ -170,6 +233,9 @@ function getFallbackImageByCategory(categoryName = "", categorySlug = "") {
   }
   if (slug === "plastik-dan-wadah" || name === "plastik & wadah" || name === "plastik dan wadah") {
     return "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?q=80&w=1200&auto=format&fit=crop";
+  }
+  if (slug === "makanan-instan") {
+    return "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?q=80&w=1200&auto=format&fit=crop";
   }
 
   return "https://via.placeholder.com/600x400?text=No+Image";
@@ -180,59 +246,16 @@ function getFallbackImageByProduct(productName = "", categoryName = "", category
 
   const imageByProduct = {
     "beras premium 5kg": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=1200&auto=format&fit=crop",
-    "minyak goreng 2l": "https://images.unsplash.com/photo-1620706857370-e1b9770e8bb1?q=80&w=1200&auto=format&fit=crop",
+    "beras pandan wangi super 5kg": "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=1200&auto=format&fit=crop",
+    "minyak goreng 2l": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=1200&auto=format&fit=crop",
+    "minyak goreng bimoli 2 liter": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=1200&auto=format&fit=crop",
     "gula pasir 1kg": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=1200&auto=format&fit=crop",
     "tepung terigu 1kg": "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=1200&auto=format&fit=crop",
     "telur ayam 1kg": "https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=1200&auto=format&fit=crop",
     "mie instan paket 5": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?q=80&w=1200&auto=format&fit=crop",
-    "susu kental manis": "https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=1200&auto=format&fit=crop",
-    "kopi bubuk sachet": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop",
-    "teh celup box": "https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?q=80&w=1200&auto=format&fit=crop",
-    "garam dapur 500gr": "https://images.unsplash.com/photo-1518110925495-5fe2fda0442f?q=80&w=1200&auto=format&fit=crop",
-
-    "wajan anti lengket": "https://images.unsplash.com/photo-1584990347449-a8f52f1f2f4d?q=80&w=1200&auto=format&fit=crop",
-    "panci stainless": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200&auto=format&fit=crop",
-    "spatula nilon": "https://images.unsplash.com/photo-1583778176476-4a8b02d1d3c1?q=80&w=1200&auto=format&fit=crop",
-    "sendok sayur": "https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1200&auto=format&fit=crop",
-    "pisau dapur": "https://images.unsplash.com/photo-1593618998160-e34014e67546?q=80&w=1200&auto=format&fit=crop",
-    "talenan plastik": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1200&auto=format&fit=crop",
-    "saringan minyak": "https://images.unsplash.com/photo-1576867757603-05b134ebc379?q=80&w=1200&auto=format&fit=crop",
-    "rak piring mini": "https://images.unsplash.com/photo-1582582494700-7c0d0d3731ae?q=80&w=1200&auto=format&fit=crop",
-    "gelas ukur": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1200&auto=format&fit=crop",
-    "baskom dapur": "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?q=80&w=1200&auto=format&fit=crop",
-
-    "ember plastik besar": "https://images.unsplash.com/photo-1583947582886-f40ec95dd752?q=80&w=1200&auto=format&fit=crop",
-    "gayung plastik": "https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?q=80&w=1200&auto=format&fit=crop",
-    "sapu lantai": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop",
-    "pel lantai": "https://images.unsplash.com/photo-1581579186913-45acb313e8d3?q=80&w=1200&auto=format&fit=crop",
-    "keranjang baju": "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop",
-    "tempat sampah mini": "https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=1200&auto=format&fit=crop",
-    "rak plastik susun": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
-    "gantungan baju": "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop",
-    "lap kanebo": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop",
-    "keset rumah": "https://images.unsplash.com/photo-1616628182509-6e5d853ee1bc?q=80&w=1200&auto=format&fit=crop",
-
-    "sabun cuci piring": "https://images.unsplash.com/photo-1583947582886-f40ec95dd752?q=80&w=1200&auto=format&fit=crop",
-    "deterjen bubuk": "https://images.unsplash.com/photo-1610552050890-fe99536c2614?q=80&w=1200&auto=format&fit=crop",
-    "pembersih lantai": "https://images.unsplash.com/photo-1585421514738-01798e348b17?q=80&w=1200&auto=format&fit=crop",
-    "pewangi pakaian": "https://images.unsplash.com/photo-1616628182509-6e5d853ee1bc?q=80&w=1200&auto=format&fit=crop",
-    "tisu gulung": "https://images.unsplash.com/photo-1583947581924-a6d6f1d41f7b?q=80&w=1200&auto=format&fit=crop",
-    "sabun mandi batang": "https://images.unsplash.com/photo-1600857062241-98e5dba7f214?q=80&w=1200&auto=format&fit=crop",
-    "sikat baju": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop",
-    "pembersih kamar mandi": "https://images.unsplash.com/photo-1585421514738-01798e348b17?q=80&w=1200&auto=format&fit=crop",
-    "handwash refill": "https://images.unsplash.com/photo-1583947581924-a6d6f1d41f7b?q=80&w=1200&auto=format&fit=crop",
-    "kaporit pembersih": "https://images.unsplash.com/photo-1585421514738-01798e348b17?q=80&w=1200&auto=format&fit=crop",
-
-    "toples plastik": "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?q=80&w=1200&auto=format&fit=crop",
-    "wadah makan kotak": "https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1200&auto=format&fit=crop",
-    "botol minum plastik": "https://images.unsplash.com/photo-1523362628745-0c100150b504?q=80&w=1200&auto=format&fit=crop",
-    "kotak serbaguna": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
-    "tempat bumbu": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1200&auto=format&fit=crop",
-    "plastik sampah roll": "https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=1200&auto=format&fit=crop",
-    "plastik klip": "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?q=80&w=1200&auto=format&fit=crop",
-    "lunch box plastik": "https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1200&auto=format&fit=crop",
-    "tempat sendok": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1200&auto=format&fit=crop",
-    "wadah beras mini": "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=1200&auto=format&fit=crop"
+    "indomie goreng spesial (per dus)": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?q=80&w=1200&auto=format&fit=crop",
+    "mie sedaap soto 1 dus": "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=1200&auto=format&fit=crop",
+    "pop mie ayam": "https://images.unsplash.com/photo-1626808642875-0aa545482dfb?q=80&w=1200&auto=format&fit=crop"
   };
 
   if (imageByProduct[name]) {
@@ -260,6 +283,23 @@ function resolveProductImage(product) {
   return getFallbackImageByProduct(product.name, product.category_name, product.category_slug);
 }
 
+function handleAddToCartHome(product) {
+  if (typeof addToCart === "function") {
+    addToCart(product);
+  }
+  updateCartBadge();
+  showToast(`${product.name} ditambahkan ke keranjang`);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 async function loadKategori() {
   const grid = document.getElementById("kategori-grid");
   if (!grid) return;
@@ -276,20 +316,97 @@ async function loadKategori() {
       return;
     }
 
-    grid.innerHTML = res.data.map(cat => {
+    const descriptionMap = {
+      "sembako": "Kebutuhan pokok harian seperti beras, gula, minyak, telur, dan stok rumah lainnya.",
+      "kebutuhan-dapur": "Peralatan dan perlengkapan dapur agar aktivitas memasak jadi lebih praktis.",
+      "makanan-instan": "Pilihan makanan praktis untuk stok rumah, bekal, dan kebutuhan cepat saji.",
+      "kebersihan": "Produk kebersihan rumah tangga untuk menjaga rumah tetap bersih dan nyaman.",
+      "plastik-dan-wadah": "Wadah dan perlengkapan penyimpanan untuk kebutuhan rumah tangga sehari-hari.",
+      "peralatan-rumah-tangga": "Perlengkapan rumah tangga serbaguna untuk memudahkan aktivitas keluarga."
+    };
+
+    const preferredOrder = [
+      "sembako",
+      "kebutuhan-dapur",
+      "makanan-instan",
+      "kebersihan",
+      "plastik-dan-wadah",
+      "peralatan-rumah-tangga"
+    ];
+
+    const fallbackCategories = [
+      { name: "Sembako", slug: "sembako", icon: "bi-box-seam-fill" },
+      { name: "Kebutuhan Dapur", slug: "kebutuhan-dapur", icon: "bi-basket2-fill" },
+      { name: "Makanan Instan", slug: "makanan-instan", icon: "bi-cup-hot-fill" },
+      { name: "Kebersihan", slug: "kebersihan", icon: "bi-stars" }
+    ];
+
+    const categories = res.data
+      .map((cat) => ({
+        ...cat,
+        safeSlug: getSafeCategorySlug(cat)
+      }))
+      .filter((cat) => !!cat.safeSlug);
+
+    const seen = new Set();
+    const uniqueCategories = categories.filter((cat) => {
+      if (seen.has(cat.safeSlug)) return false;
+      seen.add(cat.safeSlug);
+      return true;
+    });
+
+    uniqueCategories.sort((a, b) => {
+      const indexA = preferredOrder.indexOf(a.safeSlug);
+      const indexB = preferredOrder.indexOf(b.safeSlug);
+
+      const safeIndexA = indexA === -1 ? 999 : indexA;
+      const safeIndexB = indexB === -1 ? 999 : indexB;
+
+      return safeIndexA - safeIndexB;
+    });
+
+    let homepageCategories = uniqueCategories.slice(0, 4);
+
+    if (homepageCategories.length < 4) {
+      const used = new Set(homepageCategories.map(item => item.safeSlug));
+
+      fallbackCategories.forEach(item => {
+        if (homepageCategories.length >= 4) return;
+        if (used.has(item.slug)) return;
+
+        homepageCategories.push({
+          ...item,
+          safeSlug: item.slug
+        });
+        used.add(item.slug);
+      });
+    }
+
+    grid.innerHTML = homepageCategories.map((cat, index) => {
       const iconClass = cat.icon || "bi-box-seam-fill";
+      const desc =
+        descriptionMap[cat.safeSlug] ||
+        "Lihat koleksi produk pilihan dalam kategori ini dan temukan kebutuhan terbaik untuk rumah Anda.";
 
       return `
-        <div class="col-6 col-md-4 col-lg-3">
-          <a href="katalog.html?category=${encodeURIComponent(cat.slug)}"
-             class="category-card d-block text-decoration-none text-center p-4">
-            <div class="category-icon-box mx-auto">
-              <i class="bi ${iconClass} fs-3"></i>
+        <a href="katalog.html?category=${encodeURIComponent(cat.safeSlug)}"
+           class="category-grid-card reveal-up"
+           style="animation-delay:${index * 0.06}s;">
+          <div>
+            <div class="category-grid-icon">
+              <i class="bi ${iconClass}"></i>
             </div>
-            <h3 class="feature-title mb-2">${cat.name}</h3>
-            <p class="feature-text">Lihat semua produk kategori ini.</p>
-          </a>
-        </div>
+
+            <div class="category-grid-title">${escapeHtml(cat.name)}</div>
+
+            <div class="category-grid-text">${escapeHtml(desc)}</div>
+          </div>
+
+          <div class="category-grid-link">
+            Lihat Produk
+            <i class="bi bi-arrow-right-short"></i>
+          </div>
+        </a>
       `;
     }).join("");
   } catch (err) {
@@ -312,47 +429,81 @@ async function loadProdukPilihan() {
     if (!res.success || !res.data || res.data.length === 0) {
       grid.innerHTML = `
         <div class="col-12 text-center text-muted py-4">
-          Belum ada produk
+          Belum ada produk pilihan hari ini
         </div>
       `;
       return;
     }
 
-    grid.innerHTML = res.data.map(product => `
-      <div class="col-12 col-md-6 col-xl-3">
-        <div class="product-card">
-          <div style="height:220px; overflow:hidden;">
-            <img
-              src="${resolveProductImage(product)}"
-              alt="${product.name}"
-              class="product-image"
-              onerror="this.onerror=null;this.src='${getFallbackImageByProduct(product.name, product.category_name, product.category_slug)}';"
-            />
-          </div>
+    grid.innerHTML = res.data.map(product => {
+      const productCategorySlug = resolveCategoryAlias(product.category_slug || product.category_name || "");
 
-          <div class="product-body">
-            <div class="d-flex flex-wrap gap-2 mb-2">
-              ${product.category_name ? `<span class="badge-soft badge-category">${product.category_name}</span>` : ""}
-              ${product.badge ? `<span class="badge-soft badge-accent">${product.badge}</span>` : ""}
+      return `
+        <div class="col-12 col-md-6 col-xl-3">
+          <div class="product-card home-product-card h-100">
+            <div class="product-image-wrap" style="height: 230px; overflow: hidden; border-bottom: 1px solid var(--border-soft);">
+              <img
+                src="${resolveProductImage(product)}"
+                alt="${escapeHtml(product.name || "Produk")}"
+                class="product-image"
+                onerror="this.onerror=null;this.src='${getFallbackImageByProduct(product.name, product.category_name, product.category_slug)}';"
+              />
             </div>
 
-            <h3 class="product-title">${product.name}</h3>
-            <div class="product-meta mb-3">${product.price_range || ""}</div>
+            <div class="product-body">
+              <div class="d-flex flex-wrap gap-2 mb-2">
+                ${product.category_name ? `<span class="badge-soft badge-category">${escapeHtml(product.category_name)}</span>` : ""}
+                ${product.badge ? `<span class="badge-soft badge-accent">${escapeHtml(product.badge)}</span>` : `<span class="badge-soft badge-accent">Pilihan</span>`}
+              </div>
 
-            <div class="d-grid gap-2">
-              <a href="katalog.html?category=${encodeURIComponent(product.category_slug || "")}" class="btn btn-accent btn-sm">
-                Lihat Detail Produk
-              </a>
+              <h3 class="product-title">${escapeHtml(product.name || "-")}</h3>
+
+              <p class="feature-text mb-2" style="min-height: 48px;">
+                ${
+                  product.description
+                    ? escapeHtml(product.description.length > 70 ? product.description.slice(0, 70) + "..." : product.description)
+                    : "Produk kebutuhan harian pilihan untuk membantu belanja lebih mudah dan praktis."
+                }
+              </p>
+
+              <div class="product-meta mb-3">${escapeHtml(product.price_range || "Hubungi toko untuk harga terbaru")}</div>
+
+              <div class="home-product-actions d-grid gap-2">
+                <button
+                  class="btn btn-cart-home btn-sm"
+                  onclick='handleAddToCartHome(${JSON.stringify({
+                    id: product.id,
+                    name: product.name,
+                    price_range: product.price_range || "",
+                    image_url: product.image_url || "",
+                    category_name: product.category_name || ""
+                  }).replace(/'/g, "&apos;")})'>
+                  <i class="bi bi-cart-plus-fill me-2"></i>Tambah ke Keranjang
+                </button>
+
+                <a
+                  href="katalog.html?category=${encodeURIComponent(productCategorySlug)}"
+                  class="btn btn-detail-home btn-sm">
+                  <i class="bi bi-eye me-2"></i>Lihat Detail
+                </a>
+
+                <a
+                  href="https://wa.me/6282312740855?text=${encodeURIComponent(`Halo Toserba Pak Yanto, saya ingin menanyakan produk: ${product.name}`)}"
+                  target="_blank"
+                  class="btn btn-wa-home btn-sm">
+                  <i class="bi bi-whatsapp me-2"></i>Tanya via WhatsApp
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   } catch (err) {
     console.error("Gagal memuat produk:", err);
     grid.innerHTML = `
       <div class="col-12 text-center text-danger py-4">
-        Gagal memuat produk
+        Gagal memuat produk pilihan
       </div>
     `;
   }
@@ -363,6 +514,8 @@ async function loadGallery() {
   if (!grid) return;
 
   try {
+    if (typeof getGallery !== "function") return;
+
     const res = await getGallery();
 
     if (!res.success || !res.data || res.data.length === 0) {
@@ -376,13 +529,16 @@ async function loadGallery() {
 
     grid.innerHTML = res.data.slice(0, 6).map(img => `
       <div class="col-6 col-md-4">
-        <div class="gallery-card">
+        <div class="gal-card">
           <img
-            src="${getImageUrl(img.image_url || img.file_path || img.url)}"
-            alt="${img.title || "Galeri"}"
-            class="gallery-image"
+            src="${typeof getImageUrl === "function" ? getImageUrl(img.image_url || img.file_path || img.url) : (img.image_url || img.file_path || img.url || "https://via.placeholder.com/600x400?text=No+Image")}"
+            alt="${escapeHtml(img.title || "Galeri")}"
+            class="gal-img"
             onerror="this.onerror=null;this.src='https://via.placeholder.com/600x400?text=No+Image';"
           />
+          <div class="gal-body">
+            <p class="gal-cap">${escapeHtml(img.title || "Galeri Toserba Pak Yanto")}</p>
+          </div>
         </div>
       </div>
     `).join("");
@@ -401,6 +557,8 @@ async function loadBlogPreview() {
   if (!grid) return;
 
   try {
+    if (typeof getBlogPosts !== "function") return;
+
     const res = await getBlogPosts({ limit: 3 });
 
     if (!res.success || !res.data || res.data.length === 0) {
@@ -419,12 +577,12 @@ async function loadBlogPreview() {
           <div style="height:220px; overflow:hidden;">
             ${
               post.thumbnail_url
-                ? `<img src="${getImageUrl(post.thumbnail_url)}" alt="${post.title}" class="blog-image" onerror="this.onerror=null;this.src='https://via.placeholder.com/800x400?text=No+Image';">`
+                ? `<img src="${typeof getImageUrl === "function" ? getImageUrl(post.thumbnail_url) : post.thumbnail_url}" alt="${escapeHtml(post.title)}" class="blog-img" onerror="this.onerror=null;this.src='https://via.placeholder.com/800x400?text=No+Image';">`
                 : `<div class="d-flex align-items-center justify-content-center h-100 fs-1">📝</div>`
             }
           </div>
-          <div class="p-3">
-            <h3 class="h6 fw-bold mb-2">${post.title}</h3>
+          <div class="blog-body">
+            <h3 class="blog-title">${escapeHtml(post.title)}</h3>
             <div class="blog-meta">${formatDate(post.created_at)}</div>
           </div>
         </a>
@@ -445,6 +603,8 @@ async function loadTestimoni() {
   if (!grid) return;
 
   try {
+    if (typeof getTestimonials !== "function") return;
+
     const res = await getTestimonials();
 
     if (!res.success || !res.data || res.data.length === 0) {
@@ -456,24 +616,26 @@ async function loadTestimoni() {
       return;
     }
 
-    const starsHtml = (rating) => {
-      const r = Math.max(0, Math.min(5, Number(rating) || 0));
-      return Array.from({ length: 5 }, (_, i) => {
-        const active = i < r;
-        return `<i class="bi bi-star-fill ${active ? "text-warning" : "text-secondary"}"></i>`;
-      }).join("");
-    };
+    grid.innerHTML = res.data.slice(0, 6).map(item => {
+      const rating = Number(item.rating || 5);
+      const initials = String(item.name || "P").trim().charAt(0).toUpperCase();
 
-    grid.innerHTML = res.data.slice(0, 3).map(t => `
-      <div class="col-md-6 col-xl-4">
-        <div class="review-card p-4">
-          <div class="mb-2">${starsHtml(t.rating)}</div>
-          <p class="feature-text fst-italic mb-3">"${t.message}"</p>
-          <div class="fw-bold">${t.name}</div>
-          <div class="review-date mt-1">${formatDate(t.created_at)}</div>
+      return `
+        <div class="col-12 col-md-6 col-xl-4">
+          <div class="testi-card h-100">
+            <div class="testi-stars">${"★".repeat(Math.max(1, Math.min(5, rating)))}</div>
+            <div class="testi-text">"${escapeHtml(item.message || "Pelayanan sangat baik dan produk lengkap.")}"</div>
+            <div class="testi-author">
+              <div class="testi-avatar">${initials}</div>
+              <div>
+                <div class="testi-name">${escapeHtml(item.name || "Pelanggan")}</div>
+                <div class="testi-role">Pelanggan</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   } catch (err) {
     console.error("Gagal memuat testimoni:", err);
     grid.innerHTML = `
@@ -486,101 +648,156 @@ async function loadTestimoni() {
 
 async function loadStats() {
   try {
-    const [prodRes, catRes, testRes] = await Promise.all([
-      getProducts({ limit: 100 }),
-      getCategories(),
-      getTestimonials()
+    const [categoriesRes, productsRes, testimonialsRes] = await Promise.allSettled([
+      typeof getCategories === "function" ? getCategories() : Promise.resolve({ success: false, data: [] }),
+      typeof getProducts === "function" ? getProducts({ limit: 500 }) : Promise.resolve({ success: false, data: [] }),
+      typeof getTestimonials === "function" ? getTestimonials() : Promise.resolve({ success: false, data: [] })
     ]);
 
-    const prodCount = prodRes?.data?.length || 0;
-    const catCount = catRes?.data?.length || 0;
-    const testCount = testRes?.data?.length || 0;
+    const categories = categoriesRes.status === "fulfilled" && categoriesRes.value?.success
+      ? (categoriesRes.value.data || [])
+      : [];
+
+    const products = productsRes.status === "fulfilled" && productsRes.value?.success
+      ? (productsRes.value.data || [])
+      : [];
+
+    const testimonials = testimonialsRes.status === "fulfilled" && testimonialsRes.value?.success
+      ? (testimonialsRes.value.data || [])
+      : [];
 
     const statProducts = document.getElementById("statProducts");
     const statCategories = document.getElementById("statCategories");
     const statTestimonials = document.getElementById("statTestimonials");
 
-    if (statProducts) statProducts.innerText = prodCount > 0 ? `${prodCount}+` : "0";
-    if (statCategories) statCategories.innerText = catCount > 0 ? `${catCount}` : "0";
-    if (statTestimonials) statTestimonials.innerText = testCount > 0 ? `${testCount}+` : "0";
+    if (statProducts) statProducts.textContent = String(products.length || 0);
+    if (statCategories) statCategories.textContent = String(categories.length || 0);
+    if (statTestimonials) statTestimonials.textContent = String(testimonials.length || 0);
   } catch (err) {
-    console.warn("Gagal memuat statistik:", err);
+    console.error("Gagal memuat statistik:", err);
   }
 }
 
 function initInquiryFormWhatsApp() {
-  const inquiryForm = document.getElementById("inquiryForm");
-  if (!inquiryForm) return;
+  const form = document.getElementById("inquiryForm");
+  if (!form) return;
 
-  inquiryForm.addEventListener("submit", function (e) {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById("customerName")?.value || "";
-    const phone = document.getElementById("customerPhone")?.value || "";
-    const interest = document.getElementById("productInterest")?.value || "-";
-    const msg = document.getElementById("customerMessage")?.value || "";
+    const nama = form.querySelector('[name="nama"]')?.value?.trim() || "";
+    const telepon = form.querySelector('[name="telepon"]')?.value?.trim() || "";
+    const produk = form.querySelector('[name="produk"]')?.value?.trim() || "";
+    const pesan = form.querySelector('[name="pesan"]')?.value?.trim() || "";
 
-    const waMessage =
-      `Halo Toko Pak Yanto,%0A%0A` +
-      `Saya ingin mengajukan pertanyaan:%0A%0A` +
-      `*Nama:* ${name}%0A` +
-      `*WA:* ${phone}%0A` +
-      `*Produk Diminati:* ${interest}%0A` +
-      `*Pesan:* ${msg}`;
+    const waText = `Halo Toserba Pak Yanto,%0A%0ASaya ingin bertanya:%0A- Nama: ${encodeURIComponent(nama)}%0A- Telepon: ${encodeURIComponent(telepon)}%0A- Produk/Kebutuhan: ${encodeURIComponent(produk)}%0A- Pesan: ${encodeURIComponent(pesan)}`;
 
-    window.open(`https://wa.me/6282312740855?text=${waMessage}`, "_blank");
+    if (typeof createOrder === "function") {
+      try {
+        await createOrder({
+          customer_name: nama,
+          phone: telepon,
+          product_interest: produk,
+          message: pesan
+        });
+      } catch (err) {
+        console.warn("Gagal simpan inquiry ke database:", err);
+      }
+    }
+
+    window.open(`https://wa.me/6282312740855?text=${waText}`, "_blank");
+    form.reset();
+    showToast("Inquiry berhasil dikirim");
   });
 }
 
 function initReviewForm() {
+  const form = document.getElementById("reviewForm");
+  if (!form) return;
+
+  let selectedRating = 5;
   const stars = document.querySelectorAll("#starRatingSelect i");
-  const ratingInput = document.getElementById("reviewerRating");
+  const ratingInput = document.getElementById("ratingValue");
 
-  stars.forEach(star => {
-    star.addEventListener("click", function () {
-      const selectedValue = parseInt(this.getAttribute("data-value"));
+  function renderStars(value) {
+    stars.forEach((star, index) => {
+      star.className = index < value ? "bi bi-star-fill" : "bi bi-star";
+    });
+  }
 
-      if (ratingInput) ratingInput.value = selectedValue;
+  if (stars.length) {
+    renderStars(selectedRating);
 
-      stars.forEach(s => {
-        if (parseInt(s.getAttribute("data-value")) <= selectedValue) {
-          s.classList.add("active");
-        } else {
-          s.classList.remove("active");
-        }
+    stars.forEach((star, index) => {
+      star.addEventListener("click", () => {
+        selectedRating = index + 1;
+        if (ratingInput) ratingInput.value = selectedRating;
+        renderStars(selectedRating);
       });
     });
-  });
+  }
 
-  const addReviewForm = document.getElementById("addReviewForm");
-  if (!addReviewForm) return;
-
-  addReviewForm.addEventListener("submit", async function (e) {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById("reviewerName")?.value.trim();
-    const rating = document.getElementById("reviewerRating")?.value;
-    const message = document.getElementById("reviewerText")?.value.trim();
+    const name = form.querySelector('[name="name"]')?.value?.trim() || "";
+    const message = form.querySelector('[name="message"]')?.value?.trim() || "";
 
-    if (!name || !rating || !message) {
-      alert("Mohon lengkapi nama, rating, dan ulasan.");
+    if (!name || !message) {
+      showToast("Nama dan ulasan wajib diisi");
       return;
     }
 
     try {
-      await submitTestimonial({
-        name,
-        rating: Number(rating),
-        message
-      });
+      if (typeof createTestimonial === "function") {
+        await createTestimonial({
+          name,
+          message,
+          rating: selectedRating
+        });
+      }
 
-      alert("Terima kasih! Ulasan Anda telah terkirim dan menunggu persetujuan moderator.");
-      addReviewForm.reset();
-      stars.forEach(s => s.classList.remove("active"));
-      if (ratingInput) ratingInput.value = "";
+      form.reset();
+      selectedRating = 5;
+      if (ratingInput) ratingInput.value = 5;
+      renderStars(5);
+      showToast("Terima kasih, ulasan berhasil dikirim");
+      await loadTestimoni();
+      await loadStats();
     } catch (err) {
-      console.error("Gagal mengirim ulasan:", err);
-      alert("Gagal mengirim ulasan.");
+      console.error("Gagal kirim ulasan:", err);
+      showToast("Gagal mengirim ulasan");
     }
   });
+}
+
+function updateCartBadge() {
+  if (typeof getCartCount !== "function") return;
+
+  const count = getCartCount();
+
+  const badge = document.getElementById("cartBadge");
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? "inline-flex" : "none";
+  }
+
+  const mobileBadge = document.getElementById("cartBadgeMobile");
+  if (mobileBadge) {
+    mobileBadge.textContent = `(${count})`;
+  }
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "-";
+
+  try {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    });
+  } catch {
+    return dateString;
+  }
 }
