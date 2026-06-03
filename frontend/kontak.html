@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kontak — Toko Pak Yanto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/index.html" class="text-xl font-bold text-orange-600">🏪 Toko Pak Yanto</a>
+      <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+        <li><a href="/index.html" class="hover:text-orange-600">Beranda</a></li>
+        <li><a href="/katalog.html" class="hover:text-orange-600">Katalog</a></li>
+        <li><a href="/galeri.html" class="hover:text-orange-600">Galeri</a></li>
+        <li><a href="/blog.html" class="hover:text-orange-600">Blog</a></li>
+        <li><a href="/kontak.html" class="text-orange-600 font-bold">Kontak</a></li>
+      </ul>
+      <a href="/kontak.html" class="bg-orange-600 text-white text-sm px-4 py-2 rounded-full hover:bg-orange-700 transition">💬 Hubungi Kami</a>
+    </div>
+  </nav>
+
+  <div class="pt-20 max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+
+    <!-- INFO TOKO — Statis, sesuaikan dengan data toko asli -->
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-800">Lokasi & <span class="text-orange-600">Kontak</span></h1>
+      <p class="text-gray-500 mt-1">Kami siap membantu kebutuhan rumah tangga Anda</p>
+
+      <div class="mt-8 space-y-5">
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-lg flex-shrink-0">📍</div>
+          <div>
+            <div class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Alamat</div>
+            <div class="text-gray-700 mt-1">Jl. Asrama Brimob, Bandung<br>Jawa Barat</div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🕐</div>
+          <div>
+            <div class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Jam Buka</div>
+            <div class="text-gray-700 mt-1">Senin – Sabtu: 07.00 – 17.00<br>Minggu: 08.00 – 14.00</div>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-lg flex-shrink-0">💬</div>
+          <div>
+            <div class="text-xs text-gray-400 font-semibold uppercase tracking-wide">WhatsApp</div>
+            <div class="text-gray-700 mt-1">0812-xxxx-xxxx</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TODO: Ganti src dengan embed Google Maps toko asli -->
+      <div class="mt-8 bg-gray-200 rounded-2xl h-56 flex items-center justify-center text-gray-400 text-sm">
+        🗺️ Embed Google Maps di sini
+      </div>
+    </div>
+
+    <!-- FORM INQUIRY — JANGAN UBAH id-id form -->
+    <div>
+      <h2 class="text-2xl font-extrabold text-gray-800">Kirim <span class="text-orange-600">Pertanyaan</span></h2>
+      <p class="text-gray-500 mt-1 text-sm">Isi form di bawah, kami akan balas via WhatsApp</p>
+
+      <form id="form-inquiry" class="mt-6 space-y-4">
+        <div>
+          <label class="text-sm font-semibold text-gray-700">Nama Lengkap *</label>
+          <input id="inp-nama" type="text" placeholder="Nama kamu"
+            class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-400 text-sm">
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-700">Nomor HP / WhatsApp *</label>
+          <input id="inp-phone" type="text" placeholder="08xxxxxxxxxx"
+            class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-400 text-sm">
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-700">Produk yang Diminati</label>
+          <input id="inp-produk" type="text" placeholder="Contoh: Piring plastik, ember 10L..."
+            class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-400 text-sm">
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-700">Pesan</label>
+          <textarea id="inp-pesan" rows="4" placeholder="Pertanyaan atau keterangan tambahan..."
+            class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-400 text-sm resize-none"></textarea>
+        </div>
+
+        <!-- Pesan error/sukses — JANGAN UBAH id -->
+        <div id="form-error" class="hidden text-red-500 text-sm"></div>
+        <div id="form-success" class="hidden text-green-600 text-sm"></div>
+
+        <button type="submit" id="btn-submit"
+          class="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold hover:bg-orange-700 transition">
+          💬 Kirim via WhatsApp
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="bg-gray-800 text-white py-8 mt-16">
+    <div class="text-center text-sm text-gray-400">© 2025 Toko Pak Yanto — Jl. Asrama Brimob, Bandung</div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/kontak.js"></script>
+</body>
+</html>

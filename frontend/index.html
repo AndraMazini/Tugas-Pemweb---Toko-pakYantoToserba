@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toserba Pak Yanto | Toko Kebutuhan Harian Terpercaya</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary: #0a1628;
+      --primary-mid: #112040;
+      --accent: #f59e0b;
+      --accent2: #fb923c;
+      --accent-glow: rgba(245,158,11,0.25);
+      --green-wa: #22c55e;
+      --bg: #f5f7fa;
+      --bg-card: #ffffff;
+      --bg-soft: #eef1f7;
+      --text: #0d1b2e;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 20px 60px rgba(10,22,40,0.10);
+      --shadow-sm: 0 4px 20px rgba(10,22,40,0.07);
+      --radius: 20px;
+      --radius-sm: 12px;
+
+      /* dark */
+      --dk-bg: #060d18;
+      --dk-card: #0f1c2e;
+      --dk-soft: #162234;
+      --dk-border: #1e3050;
+      --dk-text: #e8edf5;
+      --dk-muted: #8fa3bf;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-top: 76px;
+      line-height: 1.65;
+      transition: background .3s, color .3s;
+      overflow-x: hidden;
+    }
+
+    body.dark {
+      background: var(--dk-bg);
+      color: var(--dk-text);
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 99px; }
+
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(226,232,240,0.6);
+      transition: all .3s;
+    }
+    body.dark .navbar {
+      background: rgba(6,13,24,0.88);
+      border-color: var(--dk-border);
+    }
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.05rem;
+      color: var(--primary); text-decoration: none;
+      letter-spacing: -.01em;
+    }
+    body.dark .nav-brand { color: var(--dk-text); }
+    .nav-brand .brand-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: #fff;
+      box-shadow: 0 4px 14px rgba(245,158,11,0.35);
+    }
+    .nav-links { display: flex; gap: 2px; list-style: none; }
+    .nav-links a {
+      display: block; padding: 8px 13px; border-radius: 10px;
+      font-size: .88rem; font-weight: 600; color: var(--muted);
+      text-decoration: none; transition: all .2s;
+    }
+    body.dark .nav-links a { color: var(--dk-muted); }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--accent); background: rgba(245,158,11,0.08);
+    }
+    .nav-cta { display: flex; align-items: center; gap: 8px; }
+    .btn-primary-cta {
+      padding: 9px 20px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-weight: 700; font-size: .88rem;
+      border: none; cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.35);
+      transition: all .25s;
+    }
+    .btn-primary-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.4); color: #fff; }
+    .btn-ghost {
+      padding: 9px 14px; border-radius: 12px;
+      background: transparent; border: 1.5px solid var(--border);
+      color: var(--text); font-weight: 600; font-size: .88rem;
+      cursor: pointer; text-decoration: none; transition: all .2s;
+    }
+    body.dark .btn-ghost { border-color: var(--dk-border); color: var(--dk-text); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    #modeToggle { background: none; border: none; cursor: pointer; font-size: 1.15rem; color: var(--muted); padding: 8px; border-radius: 10px; transition: all .2s; }
+    #modeToggle:hover { background: rgba(245,158,11,0.1); color: var(--accent); }
+    .hamburger { display: none; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); }
+    body.dark .hamburger { color: var(--dk-text); }
+
+    /* mobile nav */
+    .mobile-nav {
+      display: none; flex-direction: column; gap: 4px;
+      padding: 12px 0; border-top: 1px solid var(--border);
+    }
+    body.dark .mobile-nav { border-color: var(--dk-border); }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      padding: 11px 14px; border-radius: 12px;
+      font-weight: 600; color: var(--muted); text-decoration: none;
+      transition: all .2s;
+    }
+    body.dark .mobile-nav a { color: var(--dk-muted); }
+    .mobile-nav a:hover { color: var(--accent); background: rgba(245,158,11,0.07); }
+    .mobile-nav .btn-primary-cta { text-align: center; margin-top: 6px; }
+
+    @media (max-width: 991px) {
+      .nav-links { display: none; }
+      .nav-cta .btn-primary-cta, .nav-cta .btn-ghost { display: none; }
+      .hamburger { display: block; }
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 70px 0 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 30%, rgba(245,158,11,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(17,32,64,0.06) 0%, transparent 60%);
+    }
+    body.dark .hero-bg {
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 30%, rgba(245,158,11,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(245,158,11,0.04) 0%, transparent 60%);
+    }
+    /* floating blobs */
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(60px);
+      animation: blobFloat 6s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .blob-1 { width: 280px; height: 280px; background: rgba(245,158,11,0.12); top: -80px; right: 5%; animation-delay: 0s; }
+    .blob-2 { width: 180px; height: 180px; background: rgba(251,146,60,0.1); bottom: 10%; left: -60px; animation-delay: 2s; }
+    @keyframes blobFloat {
+      from { transform: translate(0,0) scale(1); }
+      to { transform: translate(20px,-20px) scale(1.08); }
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border-radius: 999px;
+      background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+      font-size: .82rem; font-weight: 700; color: #b45309;
+      margin-bottom: 20px; letter-spacing: .02em;
+    }
+    body.dark .hero-eyebrow { background: rgba(245,158,11,0.12); color: #fbbf24; }
+    .hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+    .hero-h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.1rem, 4.5vw, 3.6rem);
+      font-weight: 800; line-height: 1.08;
+      color: var(--primary); letter-spacing: -.03em;
+      margin-bottom: 18px;
+    }
+    body.dark .hero-h1 { color: var(--dk-text); }
+    .hero-h1 .highlight {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1rem; color: var(--muted); max-width: 560px;
+      line-height: 1.8; margin-bottom: 28px;
+    }
+    body.dark .hero-sub { color: var(--dk-muted); }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 36px; }
+    .btn-hero-main {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-weight: 700; font-size: .95rem;
+      border: none; text-decoration: none; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(245,158,11,0.38);
+      transition: all .25s;
+    }
+    .btn-hero-main:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(245,158,11,0.42); color: #fff; }
+    .btn-hero-out {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: 14px;
+      border: 1.5px solid var(--border); color: var(--text);
+      font-weight: 700; font-size: .95rem; text-decoration: none;
+      background: rgba(255,255,255,0.6); transition: all .25s;
+    }
+    body.dark .btn-hero-out { border-color: var(--dk-border); color: var(--dk-text); background: rgba(15,28,46,0.6); }
+    .btn-hero-out:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* stats */
+    .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.9rem; font-weight: 800;
+      color: var(--primary); letter-spacing: -.03em; line-height: 1;
+    }
+    body.dark .stat-num { color: var(--dk-text); }
+    .stat-num span { color: var(--accent); }
+    .stat-lbl { font-size: .78rem; font-weight: 600; color: var(--muted); margin-top: 3px; }
+
+    .stat-divider { width: 1px; background: var(--border); align-self: stretch; margin: 4px 0; }
+    body.dark .stat-divider { background: var(--dk-border); }
+
+    /* hero image */
+    .hero-visual { position: relative; }
+    .hero-img-wrap {
+      border-radius: 26px; overflow: hidden;
+      box-shadow: 0 30px 80px rgba(10,22,40,0.18);
+      position: relative; border: 1px solid rgba(245,158,11,0.15);
+    }
+    .hero-img {
+      width: 100%; display: block; object-fit: cover;
+      height: 420px; transition: transform .6s ease;
+    }
+    .hero-img-wrap:hover .hero-img { transform: scale(1.04); }
+
+    /* floating badge */
+    .float-badge {
+      position: absolute; border-radius: 16px; padding: 12px 16px;
+      backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 8px 28px rgba(10,22,40,0.14);
+      display: flex; align-items: center; gap: 10px; min-width: 160px;
+      animation: floatBadge 3s ease-in-out infinite;
+    }
+    @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .float-badge.b1 { bottom: 24px; left: -20px; background: rgba(255,255,255,0.9); }
+    body.dark .float-badge.b1 { background: rgba(15,28,46,0.95); }
+    .float-badge.b2 { top: 28px; right: -20px; background: rgba(255,255,255,0.9); animation-delay: 1.5s; }
+    body.dark .float-badge.b2 { background: rgba(15,28,46,0.95); }
+    .badge-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .badge-icon.gold { background: linear-gradient(135deg,#fef3c7,#fde68a); color: #b45309; }
+    .badge-icon.green { background: linear-gradient(135deg,#dcfce7,#bbf7d0); color: #16a34a; }
+    .badge-text strong { display: block; font-size: .85rem; font-weight: 800; color: var(--text); }
+    body.dark .badge-text strong { color: var(--dk-text); }
+    .badge-text span { font-size: .74rem; color: var(--muted); }
+    body.dark .badge-text span { color: var(--dk-muted); }
+
+    /* ─── SECTION COMMON ─── */
+    .section { padding: 72px 0; }
+    .section-sm { padding: 44px 0; }
+
+    .sec-label {
+      display: inline-block; font-size: .75rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .sec-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 800; color: var(--primary);
+      letter-spacing: -.025em; line-height: 1.15;
+    }
+    body.dark .sec-title { color: var(--dk-text); }
+    .sec-sub {
+      font-size: .97rem; color: var(--muted);
+      max-width: 640px; line-height: 1.8; margin-top: 10px;
+    }
+    body.dark .sec-sub { color: var(--dk-muted); }
+
+    /* ─── FEATURES STRIP ─── */
+    .features-strip {
+      background: var(--primary);
+      padding: 50px 0;
+      position: relative; overflow: hidden;
+    }
+    .features-strip::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(245,158,11,0.08), transparent 50%);
+    }
+    .feat-card {
+      display: flex; gap: 16px; align-items: flex-start;
+      position: relative; z-index: 1;
+    }
+    .feat-icon {
+      width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
+      background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.25);
+      color: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .feat-text h4 { font-size: .95rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .feat-text p { font-size: .85rem; color: rgba(255,255,255,0.55); line-height: 1.7; margin: 0; }
+
+    /* ─── CATEGORY ─── */
+    .cat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px 20px;
+      height: 100%;
+      transition: all .3s; cursor: default;
+      box-shadow: var(--shadow-sm);
+    }
+    body.dark .cat-card { background: var(--dk-card); border-color: var(--dk-border); }
+    .cat-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 20px 50px rgba(245,158,11,0.12); }
+    .cat-icon {
+      width: 54px; height: 54px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(245,158,11,0.14), rgba(245,158,11,0.06));
+      color: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 14px;
+    }
+    .cat-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .cat-desc { font-size: .87rem; color: var(--muted); line-height: 1.7; margin: 0; }
+    body.dark .cat-desc { color: var(--dk-muted); }
+
+    /* ─── PRODUCTS ─── */
+    .prod-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden; height: 100%;
+      transition: all .3s; box-shadow: var(--shadow-sm);
+    }
+    body.dark .prod-card { background: var(--dk-card); border-color: var(--dk-border); }
+    .prod-card:hover { transform: translateY(-6px); border-color: rgba(245,158,11,0.4); box-shadow: 0 24px 60px rgba(10,22,40,0.12); }
+    .prod-img {
+      width: 100%; height: 200px; object-fit: cover; display: block;
+      transition: transform .45s ease;
+      background: var(--bg-soft);
+    }
+    .prod-card:hover .prod-img { transform: scale(1.05); }
+    .prod-body { padding: 18px; }
+    .prod-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .72rem; font-weight: 700; background: rgba(245,158,11,0.1); color: #b45309; margin-bottom: 8px; }
+    .prod-name { font-size: .97rem; font-weight: 700; margin-bottom: 8px; line-height: 1.35; min-height: 48px; }
+    .prod-desc { font-size: .85rem; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    body.dark .prod-desc { color: var(--dk-muted); }
+    .prod-footer { display: flex; gap: 8px; }
+    .btn-prod {
+      flex: 1; padding: 9px; border-radius: 10px;
+      font-size: .84rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; cursor: pointer; text-align: center;
+      text-decoration: none; transition: all .2s;
+    }
+    .btn-prod:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(245,158,11,0.3); color: #fff; }
+    .btn-prod-out {
+      padding: 9px 12px; border-radius: 10px;
+      font-size: .84rem; font-weight: 700;
+      border: 1.5px solid var(--border); background: transparent;
+      color: var(--text); cursor: pointer; transition: all .2s;
+    }
+    body.dark .btn-prod-out { border-color: var(--dk-border); color: var(--dk-text); }
+    .btn-prod-out:hover { border-color: var(--accent); color: var(--accent); }
+
+
+    .btn-outline-soft {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-weight: 700;
+      text-decoration: none;
+      transition: all .25s ease;
+      box-shadow: 0 8px 20px rgba(15, 39, 71, 0.05);
+    }
+
+    .btn-outline-soft:hover {
+      color: var(--accent);
+      border-color: rgba(245,158,11,0.35);
+      transform: translateY(-2px);
+    }
+
+    body.dark .btn-outline-soft {
+      background: var(--dk-card);
+      color: var(--dk-text);
+      border-color: var(--dk-border);
+    }
+
+    /* ─── ABOUT ─── */
+    .about-img-wrap {
+      border-radius: 24px; overflow: hidden; position: relative;
+      box-shadow: 0 28px 70px rgba(10,22,40,0.15);
+    }
+    .about-img { width: 100%; height: 440px; object-fit: cover; display: block; }
+    .about-badge {
+      position: absolute; bottom: 24px; right: 24px;
+      background: rgba(255,255,255,0.95); border-radius: 16px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 10px 32px rgba(10,22,40,0.14);
+    }
+    body.dark .about-badge { background: rgba(15,28,46,0.95); }
+    .about-badge-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; flex-shrink: 0; }
+    .about-badge-text strong { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+    body.dark .about-badge-text strong { color: var(--dk-text); }
+    .about-badge-text span { font-size: .78rem; color: var(--muted); }
+
+    .checklist { list-style: none; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .checklist li {
+      display: flex; gap: 12px; align-items: flex-start;
+      font-size: .93rem; font-weight: 500; color: var(--text);
+    }
+    body.dark .checklist li { color: var(--dk-text); }
+    .checklist .chk {
+      width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      color: #16a34a; display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; margin-top: 1px;
+    }
+
+    /* ─── GALLERY ─── */
+    .gal-card {
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: var(--shadow-sm); height: 100%;
+      border: 1px solid var(--border); transition: all .3s;
+    }
+    body.dark .gal-card { border-color: var(--dk-border); }
+    .gal-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(10,22,40,0.13); border-color: rgba(245,158,11,0.35); }
+    .gal-img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform .45s; }
+    .gal-card:hover .gal-img { transform: scale(1.05); }
+    .gal-body { padding: 14px 16px; background: var(--bg-card); }
+    body.dark .gal-body { background: var(--dk-card); }
+    .gal-cap { font-size: .86rem; color: var(--muted); margin: 0; }
+    body.dark .gal-cap { color: var(--dk-muted); }
+
+    /* ─── BLOG ─── */
+    .blog-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; height: 100%;
+      transition: all .3s; box-shadow: var(--shadow-sm);
+    }
+    body.dark .blog-card { background: var(--dk-card); border-color: var(--dk-border); }
+    .blog-card:hover { transform: translateY(-6px); border-color: rgba(245,158,11,0.35); box-shadow: 0 22px 55px rgba(10,22,40,0.12); }
+    .blog-img { width: 100%; height: 190px; object-fit: cover; display: block; transition: transform .45s; }
+    .blog-card:hover .blog-img { transform: scale(1.05); }
+    .blog-body { padding: 18px; }
+    .blog-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .71rem; font-weight: 700; background: rgba(37,99,235,0.08); color: #2563eb; margin-bottom: 8px; }
+    .blog-title { font-size: .97rem; font-weight: 700; line-height: 1.4; margin-bottom: 8px; }
+    .blog-excerpt { font-size: .85rem; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
+    body.dark .blog-excerpt { color: var(--dk-muted); }
+    .blog-meta { font-size: .78rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    body.dark .blog-meta { color: var(--dk-muted); }
+
+    /* ─── TESTIMONIALS ─── */
+    .testi-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; height: 100%;
+      transition: all .3s; box-shadow: var(--shadow-sm);
+    }
+    body.dark .testi-card { background: var(--dk-card); border-color: var(--dk-border); }
+    .testi-card:hover { transform: translateY(-5px); border-color: rgba(245,158,11,0.3); }
+    .testi-stars { color: var(--accent); font-size: .9rem; margin-bottom: 12px; }
+    .testi-text { font-size: .92rem; color: var(--muted); line-height: 1.8; font-style: italic; margin-bottom: 18px; }
+    body.dark .testi-text { color: var(--dk-muted); }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; font-weight: 800; font-size: .95rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .testi-name { font-size: .9rem; font-weight: 700; }
+    .testi-role { font-size: .78rem; color: var(--muted); }
+    body.dark .testi-role { color: var(--dk-muted); }
+
+    /* ─── CTA BANNER ─── */
+    .cta-section {
+      background: linear-gradient(135deg, var(--primary) 0%, #1a3a6c 100%);
+      border-radius: 28px; padding: 50px 44px;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute; width: 300px; height: 300px;
+      border-radius: 50%; background: rgba(245,158,11,0.08);
+      right: -80px; top: -80px; pointer-events: none;
+    }
+    .cta-section::after {
+      content: ''; position: absolute; width: 180px; height: 180px;
+      border-radius: 50%; background: rgba(255,255,255,0.03);
+      left: -50px; bottom: -40px; pointer-events: none;
+    }
+    .cta-title { font-family: 'Syne', sans-serif; font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .cta-sub { color: rgba(255,255,255,0.6); font-size: .97rem; line-height: 1.7; }
+    .btn-cta-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 26px; border-radius: 14px;
+      background: #fff; color: var(--primary);
+      font-weight: 800; font-size: .95rem;
+      text-decoration: none; transition: all .25s;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    }
+    .btn-cta-white:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); color: var(--primary); }
+
+    /* ─── CONTACT ─── */
+    .contact-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    body.dark .contact-card { background: var(--dk-card); border-color: var(--dk-border); }
+    .contact-item { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
+    .contact-item:last-child { margin-bottom: 0; }
+    .ci-icon {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.15);
+      color: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .ci-label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+    body.dark .ci-label { color: var(--dk-muted); }
+    .ci-value { font-size: .93rem; font-weight: 600; color: var(--text); line-height: 1.5; }
+    body.dark .ci-value { color: var(--dk-text); }
+
+    .form-field {
+      width: 100%; padding: 13px 16px;
+      border: 1.5px solid var(--border); border-radius: 12px;
+      background: var(--bg-soft); color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .92rem; transition: all .2s; outline: none;
+    }
+    body.dark .form-field { background: var(--dk-soft); border-color: var(--dk-border); color: var(--dk-text); }
+    .form-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+    .form-field::placeholder { color: var(--muted); }
+    body.dark .form-field::placeholder { color: var(--dk-muted); }
+    .form-label-custom { font-size: .85rem; font-weight: 600; color: var(--text); margin-bottom: 7px; display: block; }
+    body.dark .form-label-custom { color: var(--dk-text); }
+
+    .btn-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-weight: 700; font-size: .93rem;
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 18px rgba(245,158,11,0.32);
+      transition: all .25s; font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(245,158,11,0.4); }
+    .btn-submit-wa {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 12px;
+      border: 1.5px solid var(--green-wa); color: var(--green-wa);
+      font-weight: 700; font-size: .93rem;
+      background: transparent; cursor: pointer; transition: all .25s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-submit-wa:hover { background: var(--green-wa); color: #fff; transform: translateY(-2px); }
+
+    /* map */
+    .map-wrap { border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+    body.dark .map-wrap { border-color: var(--dk-border); }
+
+    /* ─── FAQ ─── */
+    .faq-item {
+      border-bottom: 1px solid var(--border); padding: 0;
+    }
+    body.dark .faq-item { border-color: var(--dk-border); }
+    .faq-btn {
+      width: 100%; text-align: left; background: none; border: none;
+      padding: 18px 0; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .95rem; font-weight: 700; color: var(--text);
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      transition: color .2s;
+    }
+    body.dark .faq-btn { color: var(--dk-text); }
+    .faq-btn:hover { color: var(--accent); }
+    .faq-btn .faq-icon { flex-shrink: 0; font-size: 1rem; color: var(--accent); transition: transform .3s; }
+    .faq-btn[aria-expanded="true"] .faq-icon { transform: rotate(45deg); }
+    .faq-body { font-size: .9rem; color: var(--muted); line-height: 1.8; padding: 0 0 18px; }
+    body.dark .faq-body { color: var(--dk-muted); }
+
+    /* ─── STAR RATING ─── */
+    #starRatingSelect i { cursor: pointer; transition: transform .15s; }
+    #starRatingSelect i:hover { transform: scale(1.2); }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      padding: 48px 0 20px;
+    }
+    body.dark .footer { background: var(--dk-card); border-color: var(--dk-border); }
+    .footer-brand { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+    body.dark .footer-brand { color: var(--dk-text); }
+    .footer-text { font-size: .88rem; color: var(--muted); line-height: 1.8; }
+    body.dark .footer-text { color: var(--dk-muted); }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-links a { font-size: .88rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+    body.dark .footer-links a { color: var(--dk-muted); }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-h { font-size: .85rem; font-weight: 700; color: var(--text); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .06em; }
+    body.dark .footer-h { color: var(--dk-text); }
+    .socials { display: flex; gap: 8px; margin-top: 16px; }
+    .social-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--bg-soft); color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 1rem; transition: all .25s;
+    }
+    body.dark .social-btn { background: var(--dk-soft); color: var(--dk-text); }
+    .social-btn:hover { background: var(--accent); color: #fff; transform: translateY(-3px); }
+
+    /* ─── TOAST ─── */
+    .toast-custom {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: var(--primary); color: #fff;
+      padding: 14px 20px; border-radius: 14px;
+      font-size: .9rem; font-weight: 600;
+      box-shadow: 0 12px 36px rgba(10,22,40,0.22);
+      transform: translateY(80px); opacity: 0;
+      transition: all .4s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+    }
+    .toast-custom.show { transform: translateY(0); opacity: 1; }
+
+    /* ─── DIVIDER ─── */
+    .grad-divider { width: 60px; height: 4px; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); margin-top: 12px; }
+    .grad-divider.center { margin: 12px auto 0; }
+
+    /* ─── ANIMATIONS ─── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 767px) {
+      .hero { padding: 50px 0 44px; }
+      .hero-h1 { font-size: 2rem; }
+      .hero-img { height: 300px; }
+      .float-badge { display: none; }
+      .section { padding: 52px 0; }
+      .cta-section { padding: 34px 24px; }
+      .about-img { height: 300px; }
+    }
+
+    .cart-nav-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(15, 39, 71, 0.06);
+      position: relative;
+    }
+
+    .cart-nav-btn:hover {
+      color: var(--accent);
+      transform: translateY(-2px);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      border: 2px solid #fff;
+    }
+
+    body.dark .cart-nav-btn {
+      background: var(--dk-card);
+      border-color: var(--dk-border);
+      color: var(--dk-text);
+    }
+
+    body.dark .cart-badge {
+      border-color: var(--dk-card);
+    }
+
+    .toast-custom {
+      position: fixed;
+      right: 20px;
+      top: 92px;
+      bottom: auto;
+      z-index: 9999;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: .9rem;
+      font-weight: 600;
+      box-shadow: 0 12px 36px rgba(10,22,40,0.22);
+      transform: translateY(-20px);
+      opacity: 0;
+      transition: all .35s ease;
+      pointer-events: none;
+    }
+
+    .toast-custom.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .home-product-card .product-image {
+      height: 230px;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .home-product-card .product-body {
+      padding: 18px;
+    }
+
+    .home-product-card .product-title {
+      font-size: 1.02rem;
+      min-height: 56px;
+      line-height: 1.38;
+      margin-bottom: 10px;
+    }
+
+    .home-product-card .product-meta {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 14px !important;
+    }
+
+    .home-product-card .home-product-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .home-product-card .btn-cart-home {
+      background: linear-gradient(135deg, var(--accent), #fb923c);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 0.78rem 1rem;
+    }
+
+    .home-product-card .btn-cart-home:hover {
+      color: #fff;
+      opacity: 0.96;
+      transform: translateY(-1px);
+    }
+
+    .home-product-card .btn-detail-home {
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+      background: transparent;
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 0.72rem 1rem;
+    }
+
+    .home-product-card .btn-detail-home:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .home-product-card .btn-wa-home {
+      border: 1.5px solid #25d366;
+      color: #25d366;
+      background: transparent;
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 0.72rem 1rem;
+    }
+
+    .home-product-card .btn-wa-home:hover {
+      background: #25d366;
+      color: #fff;
+    }
+
+
+
+    /* ─── COMPAT / GLOBAL HELPERS ─── */
+    :root {
+      --border-soft: var(--border);
+      --text-muted: var(--muted);
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -.03em;
+      line-height: 1.12;
+      margin-bottom: 12px;
+    }
+    body.dark .section-title { color: var(--dk-text); }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.85;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    body.dark .section-subtitle { color: var(--dk-muted); }
+
+    .badge-soft {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: .74rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .badge-category {
+      background: rgba(37,99,235,0.10);
+      color: #2563eb;
+    }
+    .badge-accent {
+      background: rgba(245,158,11,0.10);
+      color: #b45309;
+    }
+
+    /* ─── CATEGORY GRID (used by index.js) ─── */
+    .category-grid-wrap {
+      display: grid !important;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 22px;
+      width: 100%;
+      margin-top: 26px;
+    }
+
+    @media (min-width: 576px) {
+      .category-grid-wrap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 576px) {
+      .category-grid-wrap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 992px) {
+      .category-grid-wrap {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .category-grid-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 24px 22px;
+      border-radius: 24px;
+      text-decoration: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,1));
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 14px 34px rgba(15, 39, 71, 0.07);
+      overflow: hidden;
+      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+    }
+
+    .category-grid-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 34%),
+        linear-gradient(180deg, transparent, rgba(10,22,40,0.01));
+      pointer-events: none;
+    }
+
+    .category-grid-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(245,158,11,0.38);
+      box-shadow: 0 22px 44px rgba(15, 39, 71, 0.12);
+    }
+
+    .kategori-footer-action {
+      margin-top: 30px;
+    }
+
+    .category-grid-icon,
+    .category-showcase-icon {
+      width: 66px;
+      height: 66px;
+      border-radius: 18px;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(245,158,11,0.16), rgba(245,158,11,0.06));
+      color: var(--accent);
+      font-size: 1.6rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-grid-title,
+    .category-showcase-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.3;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    body.dark .category-grid-title,
+    body.dark .category-showcase-title { color: var(--dk-text); }
+
+    .category-grid-text,
+    .category-showcase-text {
+      color: var(--text-muted);
+      font-size: .92rem;
+      line-height: 1.75;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+    body.dark .category-grid-text,
+    body.dark .category-showcase-text { color: var(--dk-muted); }
+
+    .category-grid-link,
+    .category-showcase-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-grid-link i,
+    .category-showcase-link i { transition: transform .25s ease; }
+
+    .category-grid-card:hover .category-grid-link i,
+    .category-showcase-card:hover .category-showcase-link i { transform: translateX(4px); }
+
+    body.dark .category-grid-card,
+    body.dark .category-grid-card,
+    body.dark .category-showcase-card {
+      background: var(--dk-card);
+      border-color: var(--dk-border);
+    }
+
+    .category-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .category-showcase-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .category-showcase-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .category-showcase-card {
+      position: relative;
+      display: block;
+      text-decoration: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 22px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(15, 39, 71, 0.06);
+      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+      overflow: hidden;
+    }
+
+    .category-showcase-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(245, 158, 11, 0.10), transparent 35%);
+      pointer-events: none;
+    }
+
+    .category-showcase-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 36px rgba(15, 39, 71, 0.12);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .category-showcase-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      margin: 0 auto 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(245,158,11,0.16), rgba(245,158,11,0.06));
+      color: var(--accent);
+      font-size: 1.75rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-showcase-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      line-height: 1.25;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-showcase-text {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-showcase-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--accent);
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-showcase-link i {
+      transition: transform .25s ease;
+    }
+
+    .category-showcase-card:hover .category-showcase-link i {
+      transform: translateX(4px);
+    }
+
+    /* animasi muncul */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: revealUp .55s ease forwards;
+    }
+
+    @keyframes revealUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    body.dark .category-showcase-card {
+      background: var(--dk-card);
+      border-color: var(--dk-border);
+    }
+
+    body.dark .category-showcase-title {
+      color: var(--dk-text);
+    }
+
+    body.dark .category-showcase-text {
+      color: var(--dk-muted);
+    }
+
+    body.dark .category-showcase-icon {
+      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(255,255,255,0.03));
+    }
+
+    .category-featured-wrap {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    @media (min-width: 768px) {
+      .category-featured-wrap {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .category-featured-card {
+      position: relative;
+      display: block;
+      text-decoration: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 26px 20px;
+      text-align: center;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(15, 39, 71, 0.06);
+      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+    }
+
+    .category-featured-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(245,158,11,0.10), transparent 34%);
+      pointer-events: none;
+    }
+
+    .category-featured-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 36px rgba(15, 39, 71, 0.12);
+      border-color: rgba(245,158,11,0.35);
+    }
+
+    .category-featured-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      margin: 0 auto 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(245,158,11,0.16), rgba(245,158,11,0.06));
+      color: var(--accent);
+      font-size: 1.7rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-featured-title {
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      line-height: 1.28;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-featured-text {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-featured-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--accent);
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-chip-section {
+      margin-top: 26px;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .category-chip-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .category-chip-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .category-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .category-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      transition: all .25s ease;
+    }
+
+    .category-chip:hover {
+      color: var(--accent);
+      border-color: rgba(245,158,11,0.35);
+      transform: translateY(-2px);
+    }
+
+    .category-more-btn {
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font-weight: 700;
+      padding: 0;
+    }
+
+    .category-hidden {
+      display: none;
+    }
+
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: revealUp .55s ease forwards;
+    }
+
+    @keyframes revealUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    body.dark .category-featured-card,
+    body.dark .category-chip-section,
+    body.dark .category-chip {
+      background: var(--dk-card);
+      border-color: var(--dk-border);
+    }
+
+    body.dark .category-featured-title,
+    body.dark .category-chip-title {
+      color: var(--dk-text);
+    }
+
+    body.dark .category-featured-text {
+      color: var(--dk-muted);
+    }
+
+    body.dark .category-chip {
+      color: var(--dk-text);
+    }
+
+    .gallery-showcase-section {
+      padding: 80px 0;
+      background: transparent;
+    }
+
+    .gallery-slider-wrap {
+      overflow: hidden;
+      position: relative;
+      margin-top: 36px;
+    }
+
+    .gallery-slider-track {
+      display: flex;
+      transition: transform 0.6s ease;
+      will-change: transform;
+    }
+
+    .gallery-slide {
+      flex: 0 0 33.3333%;
+      padding: 0 12px;
+    }
+
+    .gallery-card {
+      background: var(--bg-card, #fff);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 22px;
+      overflow: hidden;
+      height: 100%;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+    }
+
+    .gallery-card-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-card-body {
+      padding: 18px 18px 20px;
+    }
+
+    .gallery-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text, #0d1b2e);
+      margin-bottom: 8px;
+    }
+
+    .gallery-card-text {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--muted, #64748b);
+      margin-bottom: 0;
+    }
+
+    .gallery-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .gallery-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      border: none;
+      background: #cbd5e1;
+      transition: all .25s ease;
+      cursor: pointer;
+    }
+
+    .gallery-dot.active {
+      width: 30px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    body.dark .gallery-card {
+      background: var(--dk-card);
+      border-color: var(--dk-border);
+    }
+
+    body.dark .gallery-card-title {
+      color: var(--dk-text);
+    }
+
+    body.dark .gallery-card-text {
+      color: var(--dk-muted);
+    }
+
+    @media (max-width: 991px) {
+      .gallery-slide {
+        flex: 0 0 50%;
+      }
+
+      .gallery-card-img {
+        height: 280px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .gallery-slide {
+        flex: 0 0 100%;
+      }
+
+      .gallery-card-img {
+        height: 260px;
+      }
+    }
+
+    .section-kicker {
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.05;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      max-width: 760px;
+      margin: 0 auto;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--muted);
+    }
+
+    .gallery-showcase-section {
+      padding: 80px 0;
+    }
+
+    .gallery-slider-wrap {
+      overflow: hidden;
+      position: relative;
+      margin-top: 36px;
+    }
+
+    .gallery-slider-track {
+      display: flex;
+      transition: transform 0.6s ease;
+      will-change: transform;
+    }
+
+    .gallery-slide {
+      flex: 0 0 33.3333%;
+      padding: 0 12px;
+    }
+
+    .gallery-card {
+      background: var(--bg-card, #fff);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 22px;
+      overflow: hidden;
+      height: 100%;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+    }
+
+    .gallery-card-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+      background: #e5e7eb;
+    }
+
+    .gallery-card-body {
+      padding: 18px 18px 20px;
+    }
+
+    .gallery-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text, #0d1b2e);
+      margin-bottom: 8px;
+    }
+
+    .gallery-card-text {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--muted, #64748b);
+      margin-bottom: 0;
+    }
+
+    .gallery-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .gallery-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      border: none;
+      background: #cbd5e1;
+      transition: all .25s ease;
+      cursor: pointer;
+    }
+
+    .gallery-dot.active {
+      width: 30px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    body.dark .gallery-card {
+      background: var(--dk-card);
+      border-color: var(--dk-border);
+    }
+
+    body.dark .gallery-card-title {
+      color: var(--dk-text);
+    }
+
+    body.dark .gallery-card-text,
+    body.dark .section-subtitle {
+      color: var(--dk-muted);
+    }
+
+    body.dark .section-title {
+      color: var(--dk-text);
+    }
+
+    @media (max-width: 991px) {
+      .gallery-slide {
+        flex: 0 0 50%;
+      }
+
+      .gallery-card-img {
+        height: 280px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .gallery-slide {
+        flex: 0 0 100%;
+      }
+
+      .gallery-card-img {
+        height: 260px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a class="nav-brand" href="#beranda">
+          <div class="brand-icon"><i class="bi bi-shop-window"></i></div>
+          Toserba Pak Yanto
+        </a>
+
+        <ul class="nav-links mb-0">
+          <li><a href="#beranda" class="active">Beranda</a></li>
+          <li><a href="#kategori">Kategori</a></li>
+          <li><a href="#produk">Produk</a></li>
+          <li><a href="#tentang">Tentang</a></li>
+          <li><a href="#galeri">Galeri</a></li>
+          <li><a href="#blog">Blog</a></li>
+          <li><a href="#testimoni">Testimoni</a></li>
+          <li><a href="#kontak">Kontak</a></li>
+        </ul>
+
+        <div class="nav-cta">
+          <button id="modeToggle" title="Ganti mode"><i class="bi bi-moon-stars-fill"></i></button>
+
+          <a href="keranjang.html" class="cart-nav-btn" id="cartNavBtn" title="Keranjang">
+            <i class="bi bi-cart3"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+          </a>
+
+          <a href="#kontak" class="btn-primary-cta">Pesan Sekarang</a>
+          <button id="admin-btn-desktop" class="btn-ghost d-none" onclick="window.location.href='./admin/dashboard.html'">🔐 Admin</button>
+          <button class="hamburger" id="hamburger"><i class="bi bi-list"></i></button>
+        </div>
+      </div>
+
+      <!-- mobile menu -->
+      <div class="mobile-nav" id="mobileNav">
+        <a href="#beranda">Beranda</a>
+        <a href="#kategori">Kategori</a>
+        <a href="#produk">Produk</a>
+        <a href="#tentang">Tentang</a>
+        <a href="#galeri">Galeri</a>
+        <a href="#blog">Blog</a>
+        <a href="#testimoni">Testimoni</a>
+        <a href="#kontak">Kontak</a>
+        <a href="keranjang.html"><i class="bi bi-cart3 me-2"></i>Keranjang <span id="cartBadgeMobile" class="ms-1 fw-bold">(0)</span></a>
+        <a href="#kontak" class="btn-primary-cta"><i class="bi bi-bag-check me-2"></i>Pesan Sekarang</a>
+        <button id="admin-btn" class="btn-ghost d-none" onclick="window.location.href='./admin/dashboard.html'">🔐 Admin Panel</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="beranda">
+    <div class="hero-bg"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="container hero-content">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 fade-in">
+          <div class="hero-eyebrow">
+            <span class="dot"></span>
+            Toko kelontong modern, lengkap, dan terpercaya
+          </div>
+          <h1 class="hero-h1">
+            Solusi Belanja Harian<br>
+            <span class="highlight">Lengkap & Terpercaya</span><br>
+            untuk Keluarga Anda
+          </h1>
+          <p class="hero-sub">
+            Toserba Pak Yanto hadir sebagai toko serba ada yang menyediakan kebutuhan harian, sembako, produk rumah tangga, camilan, dan berbagai kebutuhan lainnya dengan pelayanan ramah, cepat, dan mudah dihubungi melalui WhatsApp.
+          </p>
+          <div class="hero-actions">
+            <a href="#produk" class="btn-hero-main">
+              <i class="bi bi-bag-check-fill"></i> Lihat Produk
+            </a>
+            <a href="#tentang" class="btn-hero-out">
+              <i class="bi bi-info-circle"></i> Tentang Kami
+            </a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <div class="stat-num"><span id="statProducts">0</span><span>+</span></div>
+              <div class="stat-lbl">Produk Tersedia</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num"><span id="statCategories">0</span></div>
+              <div class="stat-lbl">Kategori Utama</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num"><span id="statTestimonials">0</span><span>+</span></div>
+              <div class="stat-lbl">Ulasan Pelanggan</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 fade-in" style="transition-delay:.15s">
+          <div class="hero-visual">
+            <div class="hero-img-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1200&auto=format&fit=crop"
+                alt="Suasana Toserba Pak Yanto"
+                class="hero-img"
+              />
+            </div>
+            <div class="float-badge b1">
+              <div class="badge-icon green"><i class="bi bi-check-circle-fill"></i></div>
+              <div class="badge-text">
+                <strong>Produk Lengkap</strong>
+                <span>Tersedia setiap hari</span>
+              </div>
+            </div>
+            <div class="float-badge b2">
+              <div class="badge-icon gold"><i class="bi bi-star-fill"></i></div>
+              <div class="badge-text">
+                <strong>Rating Terbaik</strong>
+                <span>Pelanggan puas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES STRIP -->
+  <section class="features-strip">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-sm-6 col-lg-3 fade-in">
+          <div class="feat-card">
+            <div class="feat-icon"><i class="bi bi-box-seam-fill"></i></div>
+            <div class="feat-text">
+              <h4>Produk Lengkap</h4>
+              <p>Sembako, dapur, makanan ringan, hingga produk rumah tangga tersedia di satu tempat.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 fade-in" style="transition-delay:.1s">
+          <div class="feat-card">
+            <div class="feat-icon"><i class="bi bi-whatsapp"></i></div>
+            <div class="feat-text">
+              <h4>Mudah Inquiry</h4>
+              <p>Hubungi toko langsung melalui form inquiry yang terhubung ke WhatsApp admin.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 fade-in" style="transition-delay:.2s">
+          <div class="feat-card">
+            <div class="feat-icon"><i class="bi bi-stars"></i></div>
+            <div class="feat-text">
+              <h4>Pelayanan Ramah</h4>
+              <p>Pengalaman belanja nyaman dengan pelayanan responsif dan komunikatif.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 fade-in" style="transition-delay:.3s">
+          <div class="feat-card">
+            <div class="feat-icon"><i class="bi bi-truck-front-fill"></i></div>
+            <div class="feat-text">
+              <h4>Siap Melayani</h4>
+              <p>Cocok untuk kebutuhan rumah tangga harian hingga permintaan untuk usaha kecil.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KATEGORI -->
+  <section id="kategori" class="section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="sec-label">Kategori</span>
+        <h2 class="sec-title">Kategori Belanja Favorit</h2>
+        <p class="sec-sub mx-auto">
+          Jelajahi kategori utama pilihan Toserba Pak Yanto untuk menemukan kebutuhan harian dengan lebih cepat, mudah, dan nyaman.
+        </p>
+      </div>
+
+      <div id="kategori-grid" class="category-grid-wrap">
+        <div class="text-center text-muted py-4">
+          Memuat kategori...
+        </div>
+      </div>
+
+      <div class="kategori-footer-action text-center mt-4">
+        <a href="katalog.html" class="btn-primary-cta">
+          <i class="bi bi-grid me-2"></i>
+          Lihat Semua Kategori
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUK -->
+  <section class="section" id="produk" style="background: var(--bg-soft);">
+    <div class="container">
+      <div class="row align-items-end mb-4">
+        <div class="col-lg-7 fade-in">
+          <div class="sec-label">Produk Pilihan</div>
+          <h1 class="section-title text-lg-start text-center">Produk Pilihan Hari Ini</h1>
+          <p class="section-subtitle">
+            Rekomendasi kebutuhan harian yang paling sering dicari pelanggan, mulai dari sembako, perlengkapan dapur, hingga kebutuhan rumah tangga.
+          </p>
+        </div>
+        <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+          <a href="katalog.html" class="btn btn-outline-soft">
+            <i class="bi bi-grid me-2"></i>Lihat Semua Produk
+          </a>
+        </div>
+      </div>
+      <div class="row g-4" id="produk-grid">
+        <div class="col-12 text-center py-4 text-muted">Memuat produk...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TENTANG -->
+  <section class="section" id="tentang">
+    <div class="container">
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-5 fade-in">
+          <div class="about-img-wrap">
+            <img
+              src="https://images.unsplash.com/photo-1604719312566-8912e9c8a213?q=80&w=1400&auto=format&fit=crop"
+              alt="Tentang Toserba Pak Yanto"
+              class="about-img"
+            />
+            <div class="about-badge">
+              <div class="about-badge-icon"><i class="bi bi-shop-window"></i></div>
+              <div class="about-badge-text">
+                <strong>Sejak 2010</strong>
+                <span>Melayani Kebutuhan Harian Rumah Tangga dengan Produk Lengkap dan Harga Bersahabat</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7 fade-in" style="transition-delay:.1s">
+          <div class="sec-label">Tentang Kami</div>
+          <h2 class="sec-title">Toserba Pak Yanto</h2>
+          <div class="grad-divider"></div>
+          <p class="sec-sub mt-3">
+            Toserba Pak Yanto adalah toko serba ada yang hadir untuk memenuhi kebutuhan harian masyarakat dengan pilihan produk yang lengkap, harga terjangkau, dan layanan yang mudah dijangkau. Kami menggabungkan pelayanan toko konvensional yang hangat dengan sentuhan digital agar pelanggan lebih nyaman saat mencari informasi dan melakukan inquiry.
+          </p>
+          <ul class="checklist">
+            <li>
+              <div class="chk"><i class="bi bi-check-lg"></i></div>
+              <span>Menawarkan berbagai kategori kebutuhan rumah tangga dan konsumsi harian.</span>
+            </li>
+            <li>
+              <div class="chk"><i class="bi bi-check-lg"></i></div>
+              <span>Memudahkan pelanggan melihat katalog produk dan informasi toko secara online.</span>
+            </li>
+            <li>
+              <div class="chk"><i class="bi bi-check-lg"></i></div>
+              <span>Memberikan jalur komunikasi cepat untuk pertanyaan produk dan pemesanan.</span>
+            </li>
+            <li>
+              <div class="chk"><i class="bi bi-check-lg"></i></div>
+              <span>Cocok sebagai company profile toko modern yang tetap dekat dengan pelanggan.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALERI -->
+  <section id="galeri" class="gallery-showcase-section">
+    <div class="container">
+      <div class="section-heading text-center">
+        <span class="section-kicker">GALERI TOKO</span>
+        <h2 class="section-title">Suasana Toserba Pak Yanto</h2>
+        <p class="section-subtitle">
+          Lihat suasana toko, kelengkapan barang, dan area belanja yang melayani kebutuhan harian pelanggan secara langsung.
+        </p>
+      </div>
+
+      <div class="gallery-slider-wrap" id="gallerySliderWrap">
+        <div class="gallery-slider-track" id="gallerySliderTrack">
+          <div class="gallery-slide">
+            <div class="gallery-card">
+              <img src="assets/gallery/galeri-rak-utama.jpeg" alt="Rak barang kebutuhan harian" class="gallery-card-img">
+              <div class="gallery-card-body">
+                <h3 class="gallery-card-title">Rak Kebutuhan Harian</h3>
+                <p class="gallery-card-text">Menampilkan berbagai kebutuhan rumah tangga, pakan, perlengkapan kecil, dan stok barang harian.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-slide">
+            <div class="gallery-card">
+              <img src="assets/gallery/galeri-area-kasir.jpeg" alt="Area sembako dan kasir toko" class="gallery-card-img">
+              <div class="gallery-card-body">
+                <h3 class="gallery-card-title">Area Belanja & Sembako</h3>
+                <p class="gallery-card-text">Area toko yang berisi telur, bahan pokok, perlengkapan dapur, dan kebutuhan pelanggan sehari-hari.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-slide">
+            <div class="gallery-card">
+              <img src="assets/gallery/galeri-minuman-plastik.jpeg" alt="Minuman dingin dan produk plastik" class="gallery-card-img">
+              <div class="gallery-card-body">
+                <h3 class="gallery-card-title">Minuman & Produk Praktis</h3>
+                <p class="gallery-card-text">Pilihan minuman dingin, gelas plastik, kemasan, dan produk cepat beli yang sering dicari pelanggan.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-slide">
+            <div class="gallery-card">
+              <img src="assets/gallery/galeri-tampak-depan.jpeg" alt="Tampak depan toko" class="gallery-card-img">
+              <div class="gallery-card-body">
+                <h3 class="gallery-card-title">Tampak Depan Toko</h3>
+                <p class="gallery-card-text">Bagian depan Toserba Pak Yanto yang mudah ditemukan dan melayani kebutuhan warga sekitar setiap hari.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-slide">
+            <div class="gallery-card">
+              <img src="assets/gallery/galeri-etalase-harian.jpeg" alt="Etalase kebutuhan harian" class="gallery-card-img">
+              <div class="gallery-card-body">
+                <h3 class="gallery-card-title">Etalase Kebutuhan Lengkap</h3>
+                <p class="gallery-card-text">Etalase barang harian dengan pilihan produk kecil, makanan ringan, dan kebutuhan pelanggan yang beragam.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-dots" id="galleryDots"></div>
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section class="section" id="blog">
+    <div class="container">
+      <div class="row align-items-end mb-4">
+        <div class="col-lg-7 fade-in">
+          <div class="sec-label">Blog & Info</div>
+          <h2 class="sec-title">Artikel & Informasi Terbaru</h2>
+          <div class="grad-divider"></div>
+          <p class="sec-sub mt-3">Tips belanja, promo terbaru, dan informasi penting dari toko.</p>
+        </div>
+        <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+          <a href="blog.html" class="btn-hero-out" style="display:inline-flex;">
+            <i class="bi bi-journal-text me-2"></i>Lihat Semua Artikel
+          </a>
+        </div>
+      </div>
+      <div class="row g-4" id="blog-grid">
+        <div class="col-12 text-center py-4 text-muted">Memuat artikel...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONI -->
+  <section class="section" id="testimoni" style="background: var(--bg-soft);">
+    <div class="container">
+      <div class="text-center mb-4 fade-in">
+        <div class="sec-label">Testimoni</div>
+        <h2 class="sec-title">Apa Kata Pelanggan</h2>
+        <div class="grad-divider center"></div>
+        <p class="sec-sub mx-auto mt-3">Testimoni pelanggan menunjukkan kualitas layanan, kelengkapan produk, dan kepercayaan terhadap toko.</p>
+      </div>
+      <div class="row g-4" id="user-testimoni-grid">
+        <div class="col-12 text-center py-4 text-muted">Memuat testimoni...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="section-sm">
+    <div class="container">
+      <div class="cta-section fade-in">
+        <div class="row align-items-center g-4 position-relative" style="z-index:1">
+          <div class="col-lg-8">
+            <h2 class="cta-title">Butuh produk tertentu atau ingin bertanya langsung?</h2>
+            <p class="cta-sub">Kirimkan inquiry Anda sekarang. Tim Toserba Pak Yanto siap membantu kebutuhan produk harian Anda dengan cepat dan ramah.</p>
+          </div>
+          <div class="col-lg-4 text-lg-end">
+            <a href="#kontak" class="btn-cta-white">
+              <i class="bi bi-send-fill"></i> Kirim Inquiry
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTAK -->
+  <section class="section" id="kontak">
+    <div class="container">
+      <div class="text-center mb-5 fade-in">
+        <div class="sec-label">Kontak</div>
+        <h2 class="sec-title">Hubungi Kami</h2>
+        <div class="grad-divider center"></div>
+        <p class="sec-sub mx-auto mt-3">Gunakan form di bawah untuk bertanya tentang produk, stok, atau kebutuhan tertentu.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Info + Map -->
+        <div class="col-lg-5">
+          <div class="contact-card mb-4 fade-in">
+            <h3 class="sec-title" style="font-size:1.2rem;margin-bottom:20px;">Informasi Toko</h3>
+            <div class="contact-item">
+              <div class="ci-icon"><i class="bi bi-geo-alt-fill"></i></div>
+              <div>
+                <div class="ci-label">Alamat</div>
+                <div class="ci-value">Jl. Asrama Brigif Kp. Pengkolan, RT.02/RW.04, Kalijaya, Kec. Cikarang Bar., Kabupaten Bekasi, Jawa Barat 17530</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon"><i class="bi bi-whatsapp"></i></div>
+              <div>
+                <div class="ci-label">WhatsApp</div>
+                <div class="ci-value">0823-1274-0855</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon"><i class="bi bi-clock-fill"></i></div>
+              <div>
+                <div class="ci-label">Jam Operasional</div>
+                <div class="ci-value">Setiap hari, 07.00 – 21.00 WIB</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon"><i class="bi bi-envelope-fill"></i></div>
+              <div>
+                <div class="ci-label">Email</div>
+                <div class="ci-value">info@toserbapakyanto.com</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-card fade-in">
+            <h4 style="font-size:1rem;font-weight:700;margin-bottom:10px;">Lokasi Toko</h4>
+            <p style="font-size:.86rem;color:var(--muted);margin-bottom:14px;">Buka navigasi atau lihat peta di bawah ini.</p>
+            <div class="map-wrap" style="margin-bottom:14px;">
+              <iframe
+                src="https://www.google.com/maps?q=Jl.%20Asrama%20Brigif%20Kp.%20Pengkolan,%20RT.02/RW.04,%20Kalijaya,%20Kec.%20Cikarang%20Bar.,%20Kabupaten%20Bekasi,%20Jawa%20Barat%2017530&output=embed"
+                width="100%" height="220" style="border:0;display:block;" allowfullscreen loading="lazy">
+              </iframe>
+            </div>
+            <a href="https://maps.app.goo.gl/DPP6RScmnyjZfMSw8" target="_blank" class="btn-hero-out" style="display:flex;justify-content:center;gap:8px;">
+              <i class="bi bi-geo-alt-fill"></i> Buka di Google Maps
+            </a>
+          </div>
+        </div>
+
+        <!-- Forms -->
+        <div class="col-lg-7 d-flex flex-column gap-4">
+          <div class="contact-card fade-in" style="transition-delay:.1s">
+            <h3 class="sec-title" style="font-size:1.2rem;margin-bottom:20px;">Form Inquiry Produk</h3>
+            <form id="inquiryForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Nama Lengkap</label>
+                  <input id="customerName" type="text" class="form-field" placeholder="Masukkan nama Anda" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Nomor HP / WhatsApp</label>
+                  <input id="customerPhone" type="text" class="form-field" placeholder="08xxxxxxxxxx" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Produk yang Diminati</label>
+                  <input id="productInterest" type="text" class="form-field" placeholder="Contoh: minyak goreng, beras, sapu, dll">
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Pesan</label>
+                  <textarea id="customerMessage" class="form-field" rows="4" placeholder="Tuliskan pertanyaan atau kebutuhan Anda..."></textarea>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn-submit" id="submitInquiryBtn">
+                    <i class="bi bi-send-fill"></i> Kirim Inquiry
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="contact-card fade-in" style="transition-delay:.2s">
+            <h3 class="sec-title" style="font-size:1.2rem;margin-bottom:20px;">Kirim Ulasan Anda</h3>
+            <form id="addReviewForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Nama Anda</label>
+                  <input id="reviewerName" type="text" class="form-field" placeholder="Masukkan nama Anda" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Rating</label>
+                  <div id="starRatingSelect" class="d-flex gap-2 fs-4 text-warning mt-1">
+                    <i class="bi bi-star-fill" data-value="1" style="cursor:pointer"></i>
+                    <i class="bi bi-star-fill" data-value="2" style="cursor:pointer"></i>
+                    <i class="bi bi-star-fill" data-value="3" style="cursor:pointer"></i>
+                    <i class="bi bi-star-fill" data-value="4" style="cursor:pointer"></i>
+                    <i class="bi bi-star-fill" data-value="5" style="cursor:pointer"></i>
+                  </div>
+                  <input type="hidden" id="reviewerRating">
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Isi Ulasan</label>
+                  <textarea id="reviewerText" class="form-field" rows="4" placeholder="Tulis pengalaman Anda berbelanja di toko ini..." required></textarea>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn-submit-wa">
+                    <i class="bi bi-chat-dots-fill"></i> Kirim Ulasan
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section-sm" style="background: var(--bg-soft); padding: 60px 0;">
+    <div class="container">
+      <div class="row g-5 align-items-start">
+        <div class="col-lg-4 fade-in">
+          <div class="sec-label">FAQ</div>
+          <h2 class="sec-title">Pertanyaan yang Sering Diajukan</h2>
+          <div class="grad-divider"></div>
+          <p class="sec-sub mt-3">Bagian FAQ membantu pelanggan memahami cara bertanya produk, cara order, dan informasi dasar toko.</p>
+        </div>
+        <div class="col-lg-8 fade-in" style="transition-delay:.1s">
+          <div class="contact-card">
+            <div class="faq-item">
+              <button class="faq-btn" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true">
+                Apakah saya bisa bertanya stok produk lewat website?
+                <i class="bi bi-plus-lg faq-icon"></i>
+              </button>
+              <div id="faq1" class="collapse show">
+                <div class="faq-body">Ya, pelanggan dapat menggunakan form inquiry untuk menanyakan stok, harga, dan detail produk, lalu admin akan menindaklanjuti melalui WhatsApp.</div>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false">
+                Apakah semua produk ditampilkan di website?
+                <i class="bi bi-plus-lg faq-icon"></i>
+              </button>
+              <div id="faq2" class="collapse">
+                <div class="faq-body">Tidak selalu. Website menampilkan sebagian produk pilihan di beranda, sedangkan katalog menampilkan semua produk yang tersedia.</div>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false">
+                Apakah bisa order langsung dari website?
+                <i class="bi bi-plus-lg faq-icon"></i>
+              </button>
+              <div id="faq3" class="collapse">
+                <div class="faq-body">Untuk saat ini alur paling cocok adalah inquiry atau pilih produk lalu lanjutkan komunikasi melalui WhatsApp admin toko.</div>
+              </div>
+            </div>
+            <div class="faq-item" style="border-bottom:none;">
+              <button class="faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false">
+                Bagaimana cara memberikan testimoni?
+                <i class="bi bi-plus-lg faq-icon"></i>
+              </button>
+              <div id="faq4" class="collapse">
+                <div class="faq-body">Pelanggan dapat mengirimkan testimoni melalui fitur ulasan, lalu admin akan melakukan moderasi sebelum testimoni tampil di website.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand">
+            <i class="bi bi-shop-window me-2" style="color:var(--accent)"></i>
+            Toserba Pak Yanto
+          </div>
+          <p class="footer-text">
+            Toserba Pak Yanto hadir sebagai toko kebutuhan harian yang menyediakan berbagai perlengkapan rumah tangga, barang dapur, sembako, dan kebutuhan lainnya dengan pelayanan ramah serta respon cepat melalui WhatsApp.
+          </p>
+          <div class="socials">
+            <a href="#" class="social-btn"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="social-btn"><i class="bi bi-envelope-fill"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="footer-h">Navigasi</div>
+          <ul class="footer-links">
+            <li><a href="#beranda">Beranda</a></li>
+            <li><a href="#produk">Produk</a></li>
+            <li><a href="#galeri">Galeri</a></li>
+            <li><a href="#blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="footer-h">Informasi</div>
+          <ul class="footer-links">
+            <li><a href="#tentang">Tentang Kami</a></li>
+            <li><a href="#testimoni">Testimoni</a></li>
+            <li><a href="#kontak">Kontak</a></li>
+            <li><a href="#faq1">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4">
+          <div class="footer-h">Kontak Cepat</div>
+          <p class="footer-text mb-2"><i class="bi bi-geo-alt me-2" style="color:var(--accent)"></i>Jl. Asrama Brigif Kp. Pengkolan, RT.02/RW.04, Kalijaya, Kec. Cikarang Bar., Kabupaten Bekasi, Jawa Barat 17530</p>
+          <p class="footer-text mb-2"><i class="bi bi-whatsapp me-2" style="color:var(--accent)"></i>0823-1274-0855</p>
+          <p class="footer-text mb-0"><i class="bi bi-clock me-2" style="color:var(--accent)"></i>Setiap hari, 07.00 – 21.00 WIB</p>
+        </div>
+      </div>
+      <hr style="border-color: var(--border); margin: 32px 0 18px;">
+      <div class="text-center footer-text">
+        © 2026 Toserba Pak Yanto. All rights reserved. Designed by Toserba Pak Yanto Team.
+      </div>
+    </div>
+  </footer>
+
+   <!-- TOAST -->
+  <div class="toast-custom" id="toastFloat">Mode tampilan diubah</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/cart.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="./js/index.js"></script>
+  <script src="./js/user-login.js"></script>
+
+</body>
+</html>
