@@ -19,12 +19,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
 app.use('/api/auth', require('./src/routes/authRoutes'));
 
 // Routes person lain akan ditambahkan di sini
-// app.use('/api/products', require('./src/routes/productRoutes'));
-// app.use('/api/categories', require('./src/routes/categoryRoutes'));
-// app.use('/api/gallery', require('./src/routes/galleryRoutes'));
-// app.use('/api/testimonials', require('./src/routes/testimonialRoutes'));
-// app.use('/api/blog', require('./src/routes/blogRoutes'));
-// app.use('/api/orders', require('./src/routes/orderRoutes'));
+app.use('/api/products', require('./src/routes/productRoutes'));
+app.use('/api/categories', require('./src/routes/categoryRoutes'));
+app.use('/api/gallery', require('./src/routes/galleryRoutes'));
+app.use('/api/testimonials', require('./src/routes/testimonialRoutes'));
+app.use('/api/blog', require('./src/routes/blogRoutes'));
+app.use('/api/orders', require('./src/routes/orderRoutes'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -34,7 +34,9 @@ app.get('/', (req, res) => {
 // Error handler (harus paling bawah)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+  console.log(`📊 Database: ${process.env.DB_NAME}`);
+  console.log('✅ Semua routes aktif');
 });
