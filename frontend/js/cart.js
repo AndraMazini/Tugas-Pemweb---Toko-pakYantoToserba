@@ -14,8 +14,16 @@ function saveCart(cart) {
 }
 
 function addToCart(product) {
+
+  if (!isUserLoggedIn()) {
+    requireLogin(() => {});
+    return false;
+  }
+
   const cart = getCart();
-  const existing = cart.find(item => String(item.id) === String(product.id));
+  const existing = cart.find(
+    item => String(item.id) === String(product.id)
+  );
 
   if (existing) {
     existing.qty += 1;
@@ -31,6 +39,8 @@ function addToCart(product) {
   }
 
   saveCart(cart);
+
+  return true;
 }
 
 function removeFromCart(productId) {
@@ -126,3 +136,70 @@ function buildWhatsAppMessage(userName = "Pelanggan", detail = {}) {
 
   return message;
 }
+
+function getUserToken() {
+  return localStorage.getItem("user_token");
+}
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user_user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function isUserLoggedIn() {
+  return !!getUserToken() && !!getCurrentUser();
+}
+
+function logoutUser() {
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_user");
+  window.location.href = "index.html";
+}
+
+function requireLogin(onSuccess) {
+  if (isUserLoggedIn()) {
+    if (typeof onSuccess === "function") onSuccess();
+    return;
+  }
+
+  sessionStorage.setItem("afterUserLoginRedirect", window.location.href);
+
+  const goLogin = confirm(
+    "Untuk menambahkan produk ke keranjang atau checkout, kamu harus login terlebih dahulu.\n\nKlik OK untuk login atau register."
+  );
+
+  if (goLogin) {
+    window.location.href = "login.html";
+  }
+}
+
+function renderUserNavbar() {
+  const slot = document.getElementById("userNavSlot");
+  if (!slot) return;
+
+  const user = getCurrentUser();
+
+  if (user) {
+    const displayName = user.name || user.nama || user.email || "Customer";
+
+    slot.innerHTML = `
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-semibold">
+          <i class="bi bi-person-circle me-1"></i>${displayName}
+        </span>
+        <button class="btn btn-sm btn-outline-danger" onclick="logoutUser()">Logout</button>
+      </div>
+    `;
+  } else {
+    slot.innerHTML = `
+      <a href="login.html" class="btn-primary-cta">
+        <i class="bi bi-person"></i> Login
+      </a>
+    `;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderUserNavbar);

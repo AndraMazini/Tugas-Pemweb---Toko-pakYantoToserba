@@ -5,26 +5,43 @@
 const BASE_URL = "http://localhost:5000";
 
 // ─── TOKEN & AUTH ────────────────────────────────────────────
-function getToken() {
+function getAdminToken() {
   return localStorage.getItem("admin_token");
 }
 
-function saveToken(token) {
-  localStorage.setItem("admin_token", token);
+function saveAdminToken(token) {
+  localStorage.setItem("admin_token", token || "");
 }
 
-function removeToken() {
+function removeAdminToken() {
   localStorage.removeItem("admin_token");
   localStorage.removeItem("admin_user");
 }
 
-function isLoggedIn() {
-  return !!getToken();
+function isAdminLoggedIn() {
+  return !!getAdminToken();
 }
 
-function authHeader(isJson = true) {
+function getUserToken() {
+  return localStorage.getItem("user_token");
+}
+
+function saveUserToken(token) {
+  localStorage.setItem("user_token", token || "");
+}
+
+function removeUserToken() {
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_user");
+}
+
+function isUserLoggedIn() {
+  return !!getUserToken();
+}
+
+function adminAuthHeader(isJson = true) {
   const headers = {
-    Authorization: `Bearer ${getToken()}`
+    Authorization: `Bearer ${getAdminToken()}`
   };
 
   if (isJson) {
@@ -34,9 +51,84 @@ function authHeader(isJson = true) {
   return headers;
 }
 
-function logout() {
-  removeToken();
-  window.location.href = "login.html";
+function userAuthHeader(isJson = true) {
+  const headers = {
+    Authorization: `Bearer ${getUserToken()}`
+  };
+
+  if (isJson) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
+}
+
+function logoutAdmin() {
+  removeAdminToken();
+  window.location.href = "admin/login.html";
+}
+
+// ─── USER SESSION UI HELPERS ─────────────────────────────────
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user_user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function renderUserNavbar() {
+  const user = getCurrentUser();
+  const userNavSlot = document.getElementById("userNavSlot");
+
+  if (!userNavSlot) return;
+
+  if (user) {
+    const displayName = user.name || user.nama || user.email || "Customer";
+
+    userNavSlot.innerHTML = `
+      <div class="user-nav-box d-flex align-items-center gap-2">
+        <i class="bi bi-person-circle"></i>
+        <span>${displayName}</span>
+        <button class="btn btn-sm btn-outline-danger ms-2" onclick="logoutUser()">Logout</button>
+      </div>
+    `;
+  } else {
+    userNavSlot.innerHTML = `
+      <a href="login.html" class="btn-primary-cta">
+        <i class="bi bi-person"></i> Login
+      </a>
+    `;
+  }
+}
+
+function logoutUser() {
+  removeUserToken();
+  window.location.reload();
+}
+
+function requireUserLoginBeforeCart() {
+  const userToken = localStorage.getItem("user_token");
+  const userData = localStorage.getItem("user_user");
+
+  if (!userToken || !userData) {
+    const goLogin = confirm(
+      "Untuk menambahkan produk ke keranjang atau checkout, kamu harus login terlebih dahulu.\n\nKlik OK untuk login atau register."
+    );
+
+    if (goLogin) {
+      window.location.href = "login.html";
+    }
+
+    return false;
+  }
+
+  return true;
+}
+
+function handleAddToCart(product) {
+  if (!requireUserLoginBeforeCart()) return;
+  addToCart(product);
 }
 
 // ─── HELPER ──────────────────────────────────────────────────
@@ -95,10 +187,16 @@ function buildQuery(params = {}) {
 
 async function safeFetch(url, options = {}) {
   const res = await fetch(url, options);
-  const data = await res.json();
+
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Respons server tidak valid");
+  }
 
   if (!res.ok) {
-    throw new Error(data.message || "Terjadi kesalahan pada server");
+    throw new Error(data?.message || "Terjadi kesalahan pada server");
   }
 
   return data;
@@ -113,17 +211,17 @@ async function login(email, password) {
   });
 }
 
-async function register(name, email, password) {
+async function register(payload) {
   return await safeFetch(`${BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify(payload)
   });
 }
 
 async function getMe() {
   return await safeFetch(`${BASE_URL}/api/auth/me`, {
-    headers: authHeader()
+    headers: userAuthHeader(false)
   });
 }
 
@@ -135,7 +233,7 @@ async function getCategories() {
 async function createCategory(data) {
   return await safeFetch(`${BASE_URL}/api/categories`, {
     method: "POST",
-    headers: authHeader(),
+    headers: adminAuthHeader(),
     body: JSON.stringify(data)
   });
 }
@@ -143,7 +241,7 @@ async function createCategory(data) {
 async function updateCategory(id, data) {
   return await safeFetch(`${BASE_URL}/api/categories/${id}`, {
     method: "PUT",
-    headers: authHeader(),
+    headers: adminAuthHeader(),
     body: JSON.stringify(data)
   });
 }
@@ -151,7 +249,7 @@ async function updateCategory(id, data) {
 async function deleteCategory(id) {
   return await safeFetch(`${BASE_URL}/api/categories/${id}`, {
     method: "DELETE",
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -169,7 +267,7 @@ async function createProduct(formData) {
 
   return await safeFetch(`${BASE_URL}/api/products`, {
     method: "POST",
-    headers: isFormData ? { Authorization: `Bearer ${getToken()}` } : authHeader(),
+    headers: isFormData ? { Authorization: `Bearer ${getAdminToken()}` } : adminAuthHeader(),
     body: isFormData ? formData : JSON.stringify(formData)
   });
 }
@@ -179,7 +277,7 @@ async function updateProduct(id, formData) {
 
   return await safeFetch(`${BASE_URL}/api/products/${id}`, {
     method: "PUT",
-    headers: isFormData ? { Authorization: `Bearer ${getToken()}` } : authHeader(),
+    headers: isFormData ? { Authorization: `Bearer ${getAdminToken()}` } : adminAuthHeader(),
     body: isFormData ? formData : JSON.stringify(formData)
   });
 }
@@ -187,7 +285,7 @@ async function updateProduct(id, formData) {
 async function deleteProduct(id) {
   return await safeFetch(`${BASE_URL}/api/products/${id}`, {
     method: "DELETE",
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -199,7 +297,7 @@ async function getGallery() {
 async function createGallery(formData) {
   return await safeFetch(`${BASE_URL}/api/gallery`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${getToken()}` },
+    headers: { Authorization: `Bearer ${getAdminToken()}` },
     body: formData
   });
 }
@@ -207,7 +305,7 @@ async function createGallery(formData) {
 async function deleteGallery(id) {
   return await safeFetch(`${BASE_URL}/api/gallery/${id}`, {
     method: "DELETE",
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -218,7 +316,7 @@ async function getTestimonials() {
 
 async function getAllTestimonials() {
   return await safeFetch(`${BASE_URL}/api/testimonials/all`, {
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -233,14 +331,14 @@ async function submitTestimonial(data) {
 async function approveTestimonial(id) {
   return await safeFetch(`${BASE_URL}/api/testimonials/${id}/approve`, {
     method: "PUT",
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
 async function rejectTestimonial(id) {
   return await safeFetch(`${BASE_URL}/api/testimonials/${id}/reject`, {
     method: "PUT",
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -251,7 +349,7 @@ async function getBlogPosts(params = {}) {
 
 async function getAllBlogPosts() {
   return await safeFetch(`${BASE_URL}/api/blog/all`, {
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -262,7 +360,7 @@ async function getBlogBySlug(slug) {
 async function createBlogPost(formData) {
   return await safeFetch(`${BASE_URL}/api/blog`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${getToken()}` },
+    headers: { Authorization: `Bearer ${getAdminToken()}` },
     body: formData
   });
 }
@@ -270,7 +368,7 @@ async function createBlogPost(formData) {
 async function updateBlogPost(id, formData) {
   return await safeFetch(`${BASE_URL}/api/blog/${id}`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${getToken()}` },
+    headers: { Authorization: `Bearer ${getAdminToken()}` },
     body: formData
   });
 }
@@ -278,7 +376,7 @@ async function updateBlogPost(id, formData) {
 async function deleteBlogPost(id) {
   return await safeFetch(`${BASE_URL}/api/blog/${id}`, {
     method: "DELETE",
-    headers: authHeader()
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -293,7 +391,7 @@ async function submitOrder(data) {
 
 async function getAllOrders(params = {}) {
   return await safeFetch(`${BASE_URL}/api/orders${buildQuery(params)}`, {
-    headers: authHeader(false)
+    headers: adminAuthHeader(false)
   });
 }
 
@@ -304,7 +402,7 @@ async function getOrders() {
 async function updateOrderStatus(id, status) {
   return await safeFetch(`${BASE_URL}/api/orders/${id}/status`, {
     method: "PUT",
-    headers: authHeader(),
+    headers: adminAuthHeader(),
     body: JSON.stringify({ status })
   });
 }
@@ -312,12 +410,35 @@ async function updateOrderStatus(id, status) {
 async function deleteOrder(id) {
   return await safeFetch(`${BASE_URL}/api/orders/${id}`, {
     method: "DELETE",
-    headers: authHeader(false)
+    headers: adminAuthHeader(false)
   });
 }
 
 async function generateWaLink(id) {
   return await safeFetch(`${BASE_URL}/api/orders/generate-wa/${id}`, {
-    headers: authHeader(false)
+    headers: adminAuthHeader(false)
   });
+}
+
+// ─── ADMIN LOGIN ─────────────────────────────────────────────
+async function handleAdminLogin(email, password) {
+  const res = await login(email, password);
+
+  if (res.success) {
+    localStorage.setItem("admin_token", res.token || res.data?.token || "");
+    localStorage.setItem("admin_user", JSON.stringify(res.user || res.data?.user || res.data || {}));
+    window.location.href = "dashboard.html";
+  }
+}
+
+// ─── ORDER PAYLOAD FOR CUSTOMER ──────────────────────────────
+function buildOrderPayload(cartItems) {
+  const user = JSON.parse(localStorage.getItem("user_user") || "null");
+
+  return {
+    user_id: user?.id || null,
+    customer_name: user?.name || user?.nama || "",
+    email: user?.email || "",
+    items: cartItems
+  };
 }

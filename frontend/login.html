@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Customer — Toserba Pak Yanto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #0a1628;
+      --accent: #f59e0b;
+      --accent2: #fb923c;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --text: #0d1b2e;
+      --muted: #64748b;
+      --border: #d6e0ef;
+      --input-bg: #ffffff;
+      --shadow: 0 22px 60px rgba(10,22,40,.12);
+      --bg: linear-gradient(180deg,#f5f7fa 0%, #eef2f7 100%);
+      --dark-card: #0d2140;
+      --dark-card-2: #102749;
+      --dark-text: #e8edf5;
+      --dark-muted: #9aa9c0;
+      --dark-border: #254268;
+      --dark-input-bg: #0c2344;
+      --dark-shadow: 0 22px 60px rgba(0,0,0,.22);
+      --dark-bg: linear-gradient(180deg,#05101d 0%, #071321 100%);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px 16px;
+      transition: background .25s ease, color .25s ease;
+    }
+    body.dark {
+      --card: var(--dark-card);
+      --card-2: var(--dark-card-2);
+      --text: var(--dark-text);
+      --muted: var(--dark-muted);
+      --border: var(--dark-border);
+      --input-bg: var(--dark-input-bg);
+      --shadow: var(--dark-shadow);
+      background: var(--dark-bg);
+    }
+    .page-wrap {
+      min-height: calc(100vh - 48px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-shell {
+      width: 100%;
+      max-width: 1160px;
+      display: grid;
+      grid-template-columns: 1fr 0.96fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+    .auth-visual {
+      position: relative;
+      min-height: 760px;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(3,10,18,.18), rgba(3,10,18,.42)),
+        url("assets/hero/hero-toserba-depan.png") center/cover no-repeat;
+      box-shadow: var(--shadow);
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      isolation: isolate;
+    }
+    .auth-visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(6,19,36,.12), rgba(6,19,36,.58));
+      z-index: -1;
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -.02em;
+    }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-size: 1.15rem;
+      box-shadow: 0 10px 28px rgba(245,158,11,.32);
+      flex-shrink: 0;
+    }
+    .visual-copy { max-width: 540px; }
+    .visual-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--card) 72%, transparent);
+      color: var(--text);
+      border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+      backdrop-filter: blur(6px);
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .visual-chip .dot {
+      width: 8px; height: 8px; border-radius: 999px; background: #fbbf24;
+    }
+    .visual-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 4.4vw, 4.4rem);
+      line-height: 1.02;
+      letter-spacing: -.04em;
+      margin: 0 0 16px;
+      color: var(--text);
+    }
+    .visual-title .hl { color: #fbbf24; }
+    .visual-points {
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .visual-point {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: color-mix(in srgb, var(--text) 92%, transparent);
+      font-weight: 600;
+      font-size: .95rem;
+    }
+    .visual-point i { color: #fbbf24; }
+
+    .auth-card {
+      background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 32px 30px;
+      min-height: 760px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(245,158,11,.08), transparent 22%);
+      pointer-events: none;
+    }
+    .auth-inner { position: relative; z-index: 2; }
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .back-link, .mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .back-link:hover, .mode-btn:hover {
+      color: var(--text);
+      border-color: rgba(245,158,11,.35);
+    }
+    .auth-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(245,158,11,.10);
+      border: 1px solid rgba(245,158,11,.24);
+      color: #fbbf24;
+      font-size: .84rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .auth-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.35rem);
+      line-height: 1.04;
+      letter-spacing: -.04em;
+      margin: 0 0 14px;
+      color: var(--text);
+    }
+    .auth-sub {
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 1rem;
+      margin: 0 0 24px;
+      max-width: 520px;
+    }
+    .user-info-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(245,158,11,.10);
+      border: 1px solid rgba(245,158,11,.18);
+      color: #fbbf24;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .form-block { margin-top: 16px; }
+    .form-label {
+      display: block;
+      font-size: .92rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .form-control, textarea.form-control {
+      position: relative;
+      z-index: 5;
+      pointer-events: auto;
+      width: 100%;
+      height: 54px;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      padding: 0 16px;
+      font-size: .96rem;
+      box-shadow: none;
+      outline: none;
+    }
+    .form-control::placeholder { color: #8696b0; }
+    .form-control:focus, textarea.form-control:focus {
+      border-color: rgba(245,158,11,.55);
+      box-shadow: 0 0 0 4px rgba(245,158,11,.12);
+      background: #102a50;
+      color: var(--text);
+    }
+    .input-wrap {
+      position: relative;
+      z-index: 3;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      z-index: 6;
+    }
+    .alert-error {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(127,29,29,.18);
+      border: 1px solid rgba(248,113,113,.22);
+      color: #fca5a5;
+      font-size: .92rem;
+      font-weight: 600;
+    }
+    .alert-error.show { display: block; }
+    .login-btn {
+      width: 100%;
+      height: 56px;
+      margin-top: 22px;
+      border: 0;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 800;
+      box-shadow: 0 12px 28px rgba(245,158,11,.28);
+    }
+    .login-btn:hover { transform: translateY(-1px); }
+    .login-help {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: .92rem;
+    }
+    .login-help a {
+      color: #fbbf24;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .note-box {
+      margin-top: 22px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: color-mix(in srgb, #3b82f6 12%, transparent);
+      border: 1px solid rgba(96,165,250,.16);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: .92rem;
+    }
+    body.dark .note-box {
+      color: #b7d4ff;
+      background: rgba(37,99,235,.10);
+      border-color: rgba(96,165,250,.16);
+    }
+    body.dark .auth-title,
+    body.dark .form-label,
+    body.dark .visual-title,
+    body.dark .brand-badge {
+      color: #f3f6fb;
+    }
+    body.dark .form-control {
+      color: #f8fafc;
+    }
+    body.dark .form-control::placeholder,
+    body.dark .toggle-password {
+      color: #8fa3bf;
+    }
+    body.dark .visual-point {
+      color: rgba(255,255,255,.92);
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 991px) {
+      .auth-shell { grid-template-columns: 1fr; }
+      .auth-visual { min-height: 400px; }
+      .auth-card { min-height: auto; }
+    }
+    @media (max-width: 767px) {
+      body { padding: 16px 10px; }
+      .auth-visual, .auth-card { border-radius: 24px; }
+      .auth-visual { min-height: 340px; padding: 22px; }
+      .auth-card { padding: 24px 20px; }
+      .visual-title { font-size: 2rem; }
+      .auth-title { font-size: 2.15rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="auth-shell">
+      <section class="auth-visual">
+        <a href="index.html" class="brand-badge">
+          <span class="brand-icon"><i class="bi bi-shop"></i></span>
+          <span>Toserba Pak Yanto</span>
+        </a>
+
+        <div class="visual-copy">
+          <div class="visual-chip">
+            <span class="dot"></span>
+            Login Customer
+          </div>
+
+          <h1 class="visual-title">
+            Belanja lebih <span class="hl">mudah</span>, cepat, dan tetap rapi.
+          </h1>
+
+          <div class="visual-points">
+            <div class="visual-point"><i class="bi bi-check-circle-fill"></i> Tambah produk ke keranjang dengan akun customer</div>
+            <div class="visual-point"><i class="bi bi-check-circle-fill"></i> Checkout dengan data customer yang lebih terstruktur</div>
+            <div class="visual-point"><i class="bi bi-check-circle-fill"></i> Riwayat dan identitas user lebih mudah dikenali</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-card">
+        <div class="auth-inner">
+          <div class="top-actions">
+            <a href="index.html" class="back-link"><i class="bi bi-arrow-left"></i> Kembali</a>
+            <button type="button" class="mode-btn" id="modeToggleLogin"><i class="bi bi-moon-stars-fill"></i> Mode Gelap</button>
+          </div>
+
+          <div class="auth-kicker"><i class="bi bi-person-badge"></i> Customer Area</div>
+          <h2 class="auth-title">Masuk ke Akun Customer</h2>
+          <p class="auth-sub">Gunakan email dan password customer untuk melanjutkan belanja, checkout, dan penyimpanan data pesanan.</p>
+
+          <div class="user-info-chip">
+            <i class="bi bi-person-circle"></i>
+            <span id="user-login-info-name">Customer</span>
+          </div>
+
+          <form id="form-user-login" novalidate autocomplete="off" onsubmit="return false;">
+            <div class="form-block">
+              <label for="inp-user-email" class="form-label">Email</label>
+              <input
+                type="email"
+                id="inp-user-email"
+                name="user_email"
+                class="form-control"
+                placeholder="Masukkan email customer"
+                required
+                autocomplete="off"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                inputmode="email"
+              />
+            </div>
+
+            <div class="form-block">
+              <label for="inp-user-password" class="form-label">Password</label>
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  id="inp-user-password"
+                  name="user_password"
+                  class="form-control"
+                  placeholder="Masukkan password"
+                  required
+                  autocomplete="new-password"
+                  autocapitalize="none"
+                  autocorrect="off"
+                  spellcheck="false"
+                />
+                <button type="button" class="toggle-password" id="togglePasswordBtn" aria-label="Tampilkan password">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="login-user-error" class="alert-error hidden"></div>
+
+            <button type="submit" id="btn-user-login" class="login-btn">Masuk Sekarang</button>
+
+            <div class="login-help">
+              <span>Belum punya akun? <a href="register.html">Register</a></span>
+              <a href="admin/login.html">Login sebagai Admin</a>
+            </div>
+
+            <div class="note-box">
+              Setelah login berhasil, kamu akan diarahkan kembali ke halaman sebelumnya atau ke homepage, lalu status customer akan muncul di navbar dan fitur keranjang bisa digunakan.
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth-user.js"></script>
+  <script src="js/user-login.js"></script>
+
+  <script>
+    const modeToggleLogin = document.getElementById("modeToggleLogin");
+    const savedTheme = localStorage.getItem("theme") || "light";
+
+    function applyTheme(theme) {
+      document.body.classList.toggle("dark", theme === "dark");
+      if (modeToggleLogin) {
+        modeToggleLogin.innerHTML = theme === "dark"
+          ? '<i class="bi bi-sun-fill"></i> Mode Terang'
+          : '<i class="bi bi-moon-stars-fill"></i> Mode Gelap';
+      }
+    }
+
+    applyTheme(savedTheme);
+
+    modeToggleLogin?.addEventListener("click", () => {
+      const nextTheme = document.body.classList.contains("dark") ? "light" : "dark";
+      localStorage.setItem("theme", nextTheme);
+      applyTheme(nextTheme);
+    });
+
+    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const passwordInput = document.getElementById("inp-user-password");
+
+    togglePasswordBtn?.addEventListener("click", () => {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      togglePasswordBtn.innerHTML = isPassword
+        ? '<i class="bi bi-eye-slash"></i>'
+        : '<i class="bi bi-eye"></i>';
+    });
+
+    const redirect = sessionStorage.getItem("afterUserLoginRedirect");
+    if (redirect && redirect.includes("login.html")) {
+      sessionStorage.removeItem("afterUserLoginRedirect");
+    }
+  </script>
+</body>
+</html>

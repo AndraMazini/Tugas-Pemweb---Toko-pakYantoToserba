@@ -245,6 +245,7 @@ function showCartToast(message) {
 }
 
 function handleAddToCartFromButton(btn) {
+
   const product = {
     id: btn.dataset.id,
     name: btn.dataset.name,
@@ -253,9 +254,17 @@ function handleAddToCartFromButton(btn) {
     category_name: btn.dataset.category
   };
 
-  addToCart(product);
-  updateCartBadgeKatalog();
-  showCartToast(`${product.name} ditambahkan ke keranjang`);
+  requireLogin(() => {
+
+    addToCart(product);
+
+    updateCartBadgeKatalog();
+
+    showCartToast(
+      `${product.name} ditambahkan ke keranjang`
+    );
+
+  });
 }
 
 // =========================
@@ -497,13 +506,25 @@ function getFallbackImageByProduct(productName = "", categoryName = "", category
 }
 
 function resolveProductImage(product) {
-  const rawPath = product.image_url || "";
+  const rawPath = String(product.image_url || "").trim();
 
-  if (!rawPath || rawPath.trim() === "") {
-    return getFallbackImageByProduct(product.name, product.category_name, product.category_slug);
+  if (!rawPath) {
+    return getFallbackImageByProduct(
+      product.name,
+      product.category_name,
+      product.category_slug
+    );
   }
 
   if (/^https?:\/\//i.test(rawPath)) {
+    return rawPath;
+  }
+
+  if (
+    rawPath.startsWith("assets/") ||
+    rawPath.startsWith("./assets/") ||
+    rawPath.startsWith("../assets/")
+  ) {
     return rawPath;
   }
 
@@ -511,7 +532,7 @@ function resolveProductImage(product) {
     return getImageUrl(rawPath);
   }
 
-  return getFallbackImageByProduct(product.name, product.category_name, product.category_slug);
+  return rawPath;
 }
 
 function renderErrorState(message) {

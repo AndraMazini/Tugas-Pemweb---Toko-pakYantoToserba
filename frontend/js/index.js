@@ -9,12 +9,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadKategori();
   await loadProdukPilihan();
-  await loadGallery();
   await loadBlogPreview();
   await loadTestimoni();
   await loadStats();
 
+  initGallerySlider();
   initRevealOnScroll();
+  handleCrossPageSectionRedirect();
 });
 
 function showToast(message) {
@@ -138,12 +139,23 @@ function initRevealOnScroll() {
 function initRoleUI() {
   const adminBtn = document.getElementById("admin-btn");
   const adminBtnDesktop = document.getElementById("admin-btn-desktop");
+  const userLoginNav = document.getElementById("user-login-nav");
+  const userLogoutNav = document.getElementById("user-logout-nav");
+  const userLogoutBtn = document.getElementById("user-logout-btn");
+  const userNameText = document.getElementById("user-name-text");
 
   try {
-    const user = JSON.parse(localStorage.getItem("admin_user") || "null");
-    const token = localStorage.getItem("admin_token");
+    const adminUser = JSON.parse(localStorage.getItem("admin_user") || "null");
+    const adminToken = localStorage.getItem("admin_token");
 
-    if (user && user.role && (user.role === "admin" || user.role === "superadmin")) {
+    const currentUser = JSON.parse(localStorage.getItem("user_user") || "null");
+    const userToken = localStorage.getItem("user_token");
+
+    if (
+      adminUser &&
+      adminToken &&
+      (adminUser.role === "admin" || adminUser.role === "superadmin")
+    ) {
       adminBtn?.classList.remove("d-none");
       adminBtnDesktop?.classList.remove("d-none");
     } else {
@@ -151,30 +163,34 @@ function initRoleUI() {
       adminBtnDesktop?.classList.add("d-none");
     }
 
-    const userLoginNav = document.getElementById("user-login-nav");
-    const userLogoutNav = document.getElementById("user-logout-nav");
-    const userLogoutBtn = document.getElementById("user-logout-btn");
-
     if (userLoginNav) {
-      if (token) userLoginNav.classList.add("d-none");
+      if (userToken && currentUser) userLoginNav.classList.add("d-none");
       else userLoginNav.classList.remove("d-none");
     }
 
     if (userLogoutNav) {
-      if (token && user?.role === "user") userLogoutNav.classList.remove("d-none");
+      if (userToken && currentUser) userLogoutNav.classList.remove("d-none");
       else userLogoutNav.classList.add("d-none");
+    }
+
+    if (userNameText && currentUser) {
+      userNameText.textContent =
+        currentUser.name || currentUser.nama || currentUser.email || "Customer";
     }
 
     if (userLogoutBtn) {
       userLogoutBtn.onclick = () => {
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_user");
+        localStorage.removeItem("user_token");
+        localStorage.removeItem("user_user");
         window.location.reload();
       };
     }
-  } catch {
+  } catch (error) {
+    console.error("Gagal initRoleUI:", error);
     adminBtn?.classList.add("d-none");
     adminBtnDesktop?.classList.add("d-none");
+    userLogoutNav?.classList.add("d-none");
+    userLoginNav?.classList.remove("d-none");
   }
 }
 
@@ -194,16 +210,12 @@ function resolveCategoryAlias(slug = "") {
   const aliasMap = {
     "peralatan-dapur": "kebutuhan-dapur",
     "kebutuhan-dapur": "kebutuhan-dapur",
-
     "peralatan-rumah-tangga": "peralatan-rumah-tangga",
     "rumah-tangga": "peralatan-rumah-tangga",
-
     "plastik-wadah": "plastik-dan-wadah",
     "plastik-dan-wadah": "plastik-dan-wadah",
-
     "makanan-instan": "makanan-instan",
     "makanan instan": "makanan-instan",
-
     "sembako": "sembako",
     "kebersihan": "kebersihan"
   };
@@ -266,13 +278,25 @@ function getFallbackImageByProduct(productName = "", categoryName = "", category
 }
 
 function resolveProductImage(product) {
-  const rawPath = product.image_url || "";
+  const rawPath = String(product.image_url || "").trim();
 
-  if (!rawPath || rawPath.trim() === "") {
-    return getFallbackImageByProduct(product.name, product.category_name, product.category_slug);
+  if (!rawPath) {
+    return getFallbackImageByProduct(
+      product.name,
+      product.category_name,
+      product.category_slug
+    );
   }
 
   if (/^https?:\/\//i.test(rawPath)) {
+    return rawPath;
+  }
+
+  if (
+    rawPath.startsWith("assets/") ||
+    rawPath.startsWith("./assets/") ||
+    rawPath.startsWith("../assets/")
+  ) {
     return rawPath;
   }
 
@@ -280,15 +304,20 @@ function resolveProductImage(product) {
     return getImageUrl(rawPath);
   }
 
-  return getFallbackImageByProduct(product.name, product.category_name, product.category_slug);
+  return rawPath;
 }
 
 function handleAddToCartHome(product) {
-  if (typeof addToCart === "function") {
-    addToCart(product);
-  }
-  updateCartBadge();
-  showToast(`${product.name} ditambahkan ke keranjang`);
+  requireLogin(() => {
+
+    if (typeof addToCart === "function") {
+      addToCart(product);
+    }
+
+    updateCartBadge();
+    showToast(`${product.name} ditambahkan ke keranjang`);
+
+  });
 }
 
 function escapeHtml(value) {
@@ -298,6 +327,28 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function handleCrossPageSectionRedirect() {
+  const targetId = sessionStorage.getItem("homeScrollTarget");
+  if (!targetId) return;
+
+  const target = document.getElementById(targetId);
+  if (!target) return;
+
+  const navbar = document.getElementById("mainNavbar");
+  const offset = navbar ? navbar.offsetHeight + 10 : 90;
+
+  setTimeout(() => {
+    const topPos = target.getBoundingClientRect().top + window.pageYOffset - offset;
+
+    window.scrollTo({
+      top: topPos,
+      behavior: "smooth"
+    });
+
+    sessionStorage.removeItem("homeScrollTarget");
+  }, 250);
 }
 
 async function loadKategori() {
@@ -417,6 +468,95 @@ async function loadKategori() {
       </div>
     `;
   }
+}
+
+function initGallerySlider() {
+  const track = document.getElementById("gallerySliderTrack");
+  const dotsWrap = document.getElementById("galleryDots");
+  const wrap = document.getElementById("gallerySliderWrap");
+
+  if (!track || !dotsWrap || !wrap) return;
+
+  const slides = Array.from(track.children);
+  if (!slides.length) return;
+
+  let currentPage = 0;
+  let autoSlide;
+
+  function getPerPage() {
+    if (window.innerWidth <= 767) return 1;
+    if (window.innerWidth <= 991) return 2;
+    return 3;
+  }
+
+  function getTotalPages() {
+    return Math.ceil(slides.length / getPerPage());
+  }
+
+  function renderDots() {
+    const totalPages = getTotalPages();
+    dotsWrap.innerHTML = "";
+
+    for (let i = 0; i < totalPages; i++) {
+      const dot = document.createElement("button");
+      dot.className = `gallery-dot ${i === currentPage ? "active" : ""}`;
+      dot.addEventListener("click", () => {
+        currentPage = i;
+        updateSlider();
+        restartAutoSlide();
+      });
+      dotsWrap.appendChild(dot);
+    }
+  }
+
+  function updateSlider() {
+    const perPage = getPerPage();
+    const totalPages = getTotalPages();
+
+    if (currentPage >= totalPages) currentPage = 0;
+
+    const slideWidth = slides[0].getBoundingClientRect().width;
+    const moveX = currentPage * slideWidth * perPage;
+
+    track.style.transform = `translateX(-${moveX}px)`;
+
+    [...dotsWrap.children].forEach((dot, index) => {
+      dot.classList.toggle("active", index === currentPage);
+    });
+  }
+
+  function nextSlide() {
+    const totalPages = getTotalPages();
+    currentPage = (currentPage + 1) % totalPages;
+    updateSlider();
+  }
+
+  function startAutoSlide() {
+    autoSlide = setInterval(nextSlide, 3500);
+  }
+
+  function stopAutoSlide() {
+    clearInterval(autoSlide);
+  }
+
+  function restartAutoSlide() {
+    stopAutoSlide();
+    startAutoSlide();
+  }
+
+  renderDots();
+  updateSlider();
+  startAutoSlide();
+
+  wrap.addEventListener("mouseenter", stopAutoSlide);
+  wrap.addEventListener("mouseleave", startAutoSlide);
+
+  window.addEventListener("resize", () => {
+    currentPage = 0;
+    renderDots();
+    updateSlider();
+    restartAutoSlide();
+  });
 }
 
 async function loadProdukPilihan() {
@@ -552,16 +692,93 @@ async function loadGallery() {
   }
 }
 
+const EXTRA_PROMO_POSTS = [
+  {
+    id: "promo-extra-1",
+    title: "Produk Perawatan Baru Hadir dengan Ukuran Pilihan",
+    slug: "produk-perawatan-baru-hadir-dengan-ukuran-pilihan",
+    thumbnail_url: "assets/blog/new-product.png",
+    created_at: "2026-06-24T09:00:00",
+    content: `
+      <p>Toserba Pak Yanto menghadirkan produk perawatan baru dengan tampilan elegan dan kualitas pilihan untuk kebutuhan harian Anda. Produk ini hadir dengan beberapa ukuran praktis yang dapat disesuaikan dengan kebutuhan penggunaan di rumah maupun saat bepergian.</p>
+
+      <p>Dengan desain kemasan yang modern dan sederhana, produk ini tidak hanya menarik secara visual, tetapi juga memberikan kesan bersih, premium, dan terpercaya. Cocok untuk Anda yang menyukai produk dengan tampilan eksklusif namun tetap fungsional.</p>
+
+      <p><strong>Pilihan ukuran tersedia:</strong> 15 ml, 25 ml, dan 40 ml.<br>
+      <strong>Keunggulan produk:</strong> kemasan praktis, desain premium, nyaman digunakan sehari-hari.<br>
+      <strong>Periode promo:</strong> berlaku selama persediaan masih tersedia.</p>
+
+      <p>Dapatkan produk terbaru ini sekarang juga dan lengkapi kebutuhan perawatan Anda dengan pilihan yang lebih praktis, modern, dan berkualitas bersama Toserba Pak Yanto.</p>
+    `
+  },
+  {
+    id: "promo-extra-2",
+    title: "Electronic Flash Sale Spesial Minggu Ini",
+    slug: "electronic-flash-sale-spesial-minggu-ini",
+    thumbnail_url: "assets/blog/electronic-flash-sale.png",
+    created_at: "2026-06-25T09:00:00",
+    content: `
+      <p>Nikmati promo spesial <strong>Electronic Flash Sale</strong> dari Toserba Pak Yanto untuk berbagai produk elektronik pilihan. Ini adalah kesempatan terbaik untuk mendapatkan produk fungsional dengan harga lebih hemat dalam waktu terbatas.</p>
+
+      <p>Pada promo kali ini, kami menghadirkan beberapa produk unggulan seperti setrika dan smartwatch dengan penawaran harga spesial. Promo ini cocok untuk Anda yang ingin memenuhi kebutuhan rumah tangga sekaligus tetap mengikuti gaya hidup modern.</p>
+
+      <p><strong>Produk promo:</strong><br>
+      Setrika – <strong>Rp149.000</strong><br>
+      Smartwatch A – <strong>Rp199.000</strong></p>
+
+      <p><strong>Periode promo:</strong> 10 – 15 April.<br>
+      <strong>Status promo:</strong> limited series / stok terbatas.<br>
+      <strong>Catatan:</strong> harga promo hanya berlaku selama periode berlangsung dan selama persediaan masih ada.</p>
+
+      <p>Jangan lewatkan kesempatan ini. Segera lakukan pemesanan sekarang dan dapatkan penawaran terbaik hanya di Toserba Pak Yanto.</p>
+    `
+  },
+  {
+    id: "promo-extra-3",
+    title: "Promo Skincare Terbaru Diskon 30%",
+    slug: "promo-skincare-terbaru-diskon-30-persen",
+    thumbnail_url: "assets/blog/new-beauty-skincare.png",
+    created_at: "2026-06-26T09:00:00",
+    content: `
+      <p>Toserba Pak Yanto menghadirkan promo spesial untuk produk skincare terbaru dengan potongan harga hingga <strong>30% OFF</strong>. Ini adalah kesempatan yang tepat untuk mendapatkan produk perawatan favorit dengan harga yang lebih terjangkau.</p>
+
+      <p>Produk skincare yang tersedia dirancang untuk membantu rutinitas perawatan harian Anda, dengan kemasan modern dan tampilan premium yang memberikan kesan berkualitas sejak pertama dilihat. Promo ini sangat cocok bagi Anda yang ingin mencoba produk baru ataupun melengkapi kebutuhan perawatan pribadi.</p>
+
+      <p><strong>Penawaran spesial:</strong> Diskon hingga 30% OFF.<br>
+      <strong>Produk unggulan:</strong> serum, lotion, botol pump skincare, dan produk perawatan pilihan lainnya.<br>
+      <strong>Periode promo:</strong> berlaku selama promo berlangsung dan stok masih tersedia.</p>
+
+      <p>Segera manfaatkan promo ini sebelum berakhir. Dapatkan produk skincare favorit Anda dan rasakan pengalaman belanja yang lebih hemat dan lebih nyaman bersama Toserba Pak Yanto.</p>
+    `
+  }
+];
+
+const OLD_HIDDEN_SLUGS = [
+  "tips-memilih-beras-pandan-wangi-asli",
+  "promo-sembako-murah-jelang-akhir-bulan"
+];
+
 async function loadBlogPreview() {
   const grid = document.getElementById("blog-grid");
   if (!grid) return;
 
   try {
-    if (typeof getBlogPosts !== "function") return;
+    let apiPosts = [];
 
-    const res = await getBlogPosts({ limit: 3 });
+    if (typeof getBlogPosts === "function") {
+      const res = await getBlogPosts({ limit: 20 });
+      if (res?.success && Array.isArray(res.data)) {
+        apiPosts = res.data;
+      }
+    }
 
-    if (!res.success || !res.data || res.data.length === 0) {
+    // buang 2 artikel lama dari homepage
+    apiPosts = apiPosts.filter(post => !OLD_HIDDEN_SLUGS.includes(post.slug));
+
+    // gabungkan promo baru + artikel API lain
+    const mergedPosts = mergeHomepageBlogPosts(apiPosts).slice(0, 3);
+
+    if (!mergedPosts.length) {
       grid.innerHTML = `
         <div class="col-12 text-center text-muted py-4">
           Belum ada artikel
@@ -570,24 +787,37 @@ async function loadBlogPreview() {
       return;
     }
 
-    grid.innerHTML = res.data.map(post => `
-      <div class="col-12 col-md-4">
-        <a href="blog-detail.html?slug=${encodeURIComponent(post.slug)}"
-           class="blog-card d-block text-decoration-none text-dark h-100">
-          <div style="height:220px; overflow:hidden;">
-            ${
-              post.thumbnail_url
-                ? `<img src="${typeof getImageUrl === "function" ? getImageUrl(post.thumbnail_url) : post.thumbnail_url}" alt="${escapeHtml(post.title)}" class="blog-img" onerror="this.onerror=null;this.src='https://via.placeholder.com/800x400?text=No+Image';">`
-                : `<div class="d-flex align-items-center justify-content-center h-100 fs-1">📝</div>`
-            }
-          </div>
-          <div class="blog-body">
-            <h3 class="blog-title">${escapeHtml(post.title)}</h3>
-            <div class="blog-meta">${formatDate(post.created_at)}</div>
-          </div>
-        </a>
-      </div>
-    `).join("");
+    grid.innerHTML = mergedPosts.map(post => {
+      const imageUrl = resolveHomepageBlogImage(post);
+      const excerpt = buildHomepageBlogExcerpt(post);
+
+      return `
+        <div class="col-12 col-md-6 col-xl-4">
+          <a href="blog-detail.html?slug=${encodeURIComponent(post.slug)}"
+             class="blog-card d-block text-decoration-none h-100">
+            <img
+              src="${imageUrl}"
+              alt="${escapeHtml(post.title || "Artikel Blog")}"
+              class="blog-img"
+              onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x700?text=Promo+Toserba';"
+            />
+
+            <div class="blog-body">
+              <div class="blog-meta mb-2">
+                <i class="bi bi-calendar3 me-2"></i>
+                ${getHomepageSafeDate(post.created_at)}
+              </div>
+
+              <h3 class="blog-title">${escapeHtml(post.title || "Artikel Toko")}</h3>
+
+              <p class="blog-excerpt">
+                ${escapeHtml(excerpt)}
+              </p>
+            </div>
+          </a>
+        </div>
+      `;
+    }).join("");
   } catch (err) {
     console.error("Gagal memuat blog:", err);
     grid.innerHTML = `
@@ -597,17 +827,162 @@ async function loadBlogPreview() {
     `;
   }
 }
+function mergeHomepageBlogPosts(apiPosts = []) {
+  const map = new Map();
+
+  EXTRA_PROMO_POSTS.forEach(post => {
+    map.set(post.slug, { ...post, __priority: 1 });
+  });
+
+  apiPosts.forEach(post => {
+    if (!post?.slug) return;
+
+    if (map.has(post.slug)) {
+      const existing = map.get(post.slug);
+      map.set(post.slug, {
+        ...post,
+        title: post.title || existing.title,
+        content: post.content || existing.content,
+        thumbnail_url: post.thumbnail_url || existing.thumbnail_url,
+        created_at: post.created_at || existing.created_at,
+        __priority: existing.__priority
+      });
+    } else {
+      map.set(post.slug, {
+        ...post,
+        __priority: 0
+      });
+    }
+  });
+
+  return Array.from(map.values()).sort((a, b) => {
+    if ((b.__priority || 0) !== (a.__priority || 0)) {
+      return (b.__priority || 0) - (a.__priority || 0);
+    }
+
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
+}
+
+function resolveHomepageBlogImage(post) {
+  const path = String(post?.thumbnail_url || "").trim();
+
+  if (!path) return getHomepageFallbackBlogPoster(post);
+
+  if (/^https?:\/\//i.test(path)) return path;
+
+  if (
+    path.startsWith("assets/") ||
+    path.startsWith("./assets/") ||
+    path.startsWith("../assets/")
+  ) {
+    return path;
+  }
+
+  if (typeof getImageUrl === "function") {
+    return getImageUrl(path);
+  }
+
+  return path;
+}
+
+function getHomepageFallbackBlogPoster(post = {}) {
+  const title = String(post.title || "").toLowerCase();
+  const content = String(post.content || "").toLowerCase();
+  const text = `${title} ${content}`;
+
+  if (text.includes("furnitur") || text.includes("sofa") || text.includes("minimalis")) {
+    return "assets/blog/new-minimalist-furniture.png";
+  }
+
+  if (text.includes("friday sale") || text.includes("material") || text.includes("peralatan")) {
+    return "assets/blog/promo-friday-sale.png";
+  }
+
+  if (text.includes("perawatan") || text.includes("produk baru") || text.includes("ukuran pilihan")) {
+    return "assets/blog/new-product.png";
+  }
+
+  if (text.includes("beras")) {
+    return "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=1200&auto=format&fit=crop";
+  }
+
+  if (text.includes("promo") || text.includes("diskon") || text.includes("murah")) {
+    return "https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=1200&auto=format&fit=crop";
+  }
+
+  return "https://via.placeholder.com/1200x700?text=Promo+Toserba";
+}
+
+function buildBlogCardExcerpt(post = {}) {
+  const raw = String(stripHtml(post.content || "")).trim();
+
+  if (!raw) {
+    return "Tips belanja, promo terbaru, dan informasi penting dari toko.";
+  }
+
+  return raw.length > 110 ? raw.slice(0, 110) + "..." : raw;
+}
+
+function stripHtml(text = "") {
+  return String(text).replace(/<[^>]*>/g, " ");
+}
 
 async function loadTestimoni() {
   const grid = document.getElementById("user-testimoni-grid");
   if (!grid) return;
 
+  const fallbackTestimonials = [
+    {
+      name: "Budi Santoso",
+      rating: 5,
+      message: "Pelayanannya cepat dan produknya lengkap. Saya jadi tidak perlu pindah-pindah toko untuk cari kebutuhan rumah.",
+      role: "Pelanggan Setia"
+    },
+    {
+      name: "Siti Rahma",
+      rating: 5,
+      message: "Harga cukup bersaing dan pilihan barangnya banyak. Sangat membantu untuk belanja kebutuhan harian keluarga.",
+      role: "Ibu Rumah Tangga"
+    },
+    {
+      name: "Andi Pratama",
+      rating: 5,
+      message: "Promo-produknya menarik dan stoknya sering tersedia. Cocok untuk jadi tempat belanja langganan.",
+      role: "Pelanggan"
+    }
+  ];
+
   try {
-    if (typeof getTestimonials !== "function") return;
+    let testimonials = [];
 
-    const res = await getTestimonials();
+    if (typeof getTestimonials === "function") {
+      const res = await getTestimonials();
+      if (res?.success && Array.isArray(res.data)) {
+        testimonials = res.data;
+      }
+    }
 
-    if (!res.success || !res.data || res.data.length === 0) {
+    // kalau data backend kosong atau kurang dari 3, tambahkan fallback
+    const mergedTestimonials = [...testimonials];
+
+    if (mergedTestimonials.length < 3) {
+      fallbackTestimonials.forEach(item => {
+        if (mergedTestimonials.length >= 3) return;
+
+        const alreadyExists = mergedTestimonials.some(t =>
+          String(t.name || "").toLowerCase() === item.name.toLowerCase()
+        );
+
+        if (!alreadyExists) {
+          mergedTestimonials.push(item);
+        }
+      });
+    }
+
+    const finalTestimonials = mergedTestimonials.slice(0, 3);
+
+    if (!finalTestimonials.length) {
       grid.innerHTML = `
         <div class="col-12 text-center text-muted py-4">
           Belum ada testimoni
@@ -616,9 +991,10 @@ async function loadTestimoni() {
       return;
     }
 
-    grid.innerHTML = res.data.slice(0, 6).map(item => {
+    grid.innerHTML = finalTestimonials.map(item => {
       const rating = Number(item.rating || 5);
       const initials = String(item.name || "P").trim().charAt(0).toUpperCase();
+      const role = item.role || "Pelanggan";
 
       return `
         <div class="col-12 col-md-6 col-xl-4">
@@ -629,7 +1005,7 @@ async function loadTestimoni() {
               <div class="testi-avatar">${initials}</div>
               <div>
                 <div class="testi-name">${escapeHtml(item.name || "Pelanggan")}</div>
-                <div class="testi-role">Pelanggan</div>
+                <div class="testi-role">${escapeHtml(role)}</div>
               </div>
             </div>
           </div>
@@ -638,12 +1014,49 @@ async function loadTestimoni() {
     }).join("");
   } catch (err) {
     console.error("Gagal memuat testimoni:", err);
-    grid.innerHTML = `
-      <div class="col-12 text-center text-danger py-4">
-        Gagal memuat testimoni
-      </div>
-    `;
+
+    // fallback penuh kalau API gagal
+    grid.innerHTML = fallbackTestimonials.map(item => {
+      const initials = item.name.trim().charAt(0).toUpperCase();
+
+      return `
+        <div class="col-12 col-md-6 col-xl-4">
+          <div class="testi-card h-100">
+            <div class="testi-stars">★★★★★</div>
+            <div class="testi-text">"${escapeHtml(item.message)}"</div>
+            <div class="testi-author">
+              <div class="testi-avatar">${initials}</div>
+              <div>
+                <div class="testi-name">${escapeHtml(item.name)}</div>
+                <div class="testi-role">${escapeHtml(item.role)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
   }
+}
+
+function buildHomepageBlogExcerpt(post = {}) {
+  const raw = String(post.content || "").replace(/<[^>]*>/g, " ").trim();
+
+  if (!raw) {
+    return "Tips belanja, promo terbaru, dan informasi penting dari toko.";
+  }
+
+  return raw.length > 110 ? raw.slice(0, 110) + "..." : raw;
+}
+
+function getHomepageSafeDate(value) {
+  if (!value) return "Tanggal promo terbaru";
+
+  if (typeof formatDate === "function") {
+    const formatted = formatDate(value);
+    if (formatted && formatted !== "-") return formatted;
+  }
+
+  return "Tanggal promo terbaru";
 }
 
 async function loadStats() {
