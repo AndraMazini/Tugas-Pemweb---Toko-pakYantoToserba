@@ -43,10 +43,13 @@ const register = async (req, res) => {
       user: { id: result.insertId, name, email, role: 'user' }
     });
   } catch (err) {
-    console.error('❌ Register error:', err.message, err.code); // Debug log
-    res.status(500).json({ success: false, message: 'Server error: ' + err.message });
+    console.error("LOGIN ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error: " + err.message
+    });
   }
-};
+}
 
 // POST /api/auth/login (Login User/Admin)
 const login = async (req, res) => {

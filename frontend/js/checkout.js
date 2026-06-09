@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el?.addEventListener("change", persistCheckoutForm);
   });
 
+  
   checkoutBtn?.addEventListener("click", async () => {
     requireLogin(async () => {
       const user = getCurrentUser() || {};
