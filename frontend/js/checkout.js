@@ -19,22 +19,90 @@ document.addEventListener("DOMContentLoaded", () => {
     el?.addEventListener("change", persistCheckoutForm);
   });
 
-  checkoutBtn?.addEventListener("click", () => {
-    requireLogin(() => {
-      const user = JSON.parse(localStorage.getItem("admin_user") || "{}");
+  checkoutBtn?.addEventListener("click", async () => {
+    requireLogin(async () => {
+      const user = getCurrentUser() || {};
+      const cart = getCart();
       const formData = getCheckoutFormData();
 
-      const waMessage = buildWhatsAppMessage(
-        formData.name || user.name || "Pelanggan",
-        formData
-      );
-
-      if (!waMessage) {
+      if (!cart.length) {
         alert("Keranjang masih kosong.");
         return;
       }
 
-      window.open(`https://wa.me/6282312740855?text=${waMessage}`, "_blank");
+      if (!formData.name) {
+        alert("Nama pemesan wajib diisi.");
+        document.getElementById("checkoutName")?.focus();
+        return;
+      }
+
+      if (!formData.phone) {
+        alert("Nomor WhatsApp wajib diisi.");
+        document.getElementById("checkoutPhone")?.focus();
+        return;
+      }
+
+      const originalText = checkoutBtn.innerHTML;
+      checkoutBtn.disabled = true;
+      checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan pesanan...';
+
+      try {
+        const payload = {
+          user_id: user.id || null,
+          customer_name: formData.name || user.name || user.nama || "Pelanggan",
+          email: user.email || "",
+          phone: formData.phone || "",
+          method: formData.method || "Ambil di toko",
+          address: formData.address || "",
+          notes: formData.note || "",
+          items: cart.map((item) => ({
+            id: item.id,
+            product_id: item.id,
+            name: item.name || "",
+            product_name: item.name || "",
+            qty: Number(item.qty || 1),
+            quantity: Number(item.qty || 1),
+            price_range: item.price_range || "",
+            image_url: item.image_url || "",
+            category_name: item.category_name || ""
+          })),
+          total_items: cart.reduce((sum, item) => sum + Number(item.qty || 0), 0),
+          total_price: 0,
+          status: "Pending"
+        };
+
+        const result = await submitOrder(payload);
+
+        const waMessage = buildWhatsAppMessage(
+          payload.customer_name,
+          {
+            name: payload.customer_name,
+            phone: payload.phone,
+            method: payload.method,
+            address: payload.address,
+            note: payload.notes
+          }
+        );
+
+        if (result?.success) {
+          alert("Pesanan berhasil masuk ke sistem. Lanjutkan konfirmasi via WhatsApp.");
+          saveCheckoutInfo(formData);
+          clearCart();
+          renderCart();
+
+          if (waMessage) {
+            window.open(`https://wa.me/6282312740855?text=${waMessage}`, "_blank");
+          }
+        } else {
+          alert(result?.message || "Pesanan gagal disimpan ke sistem.");
+        }
+      } catch (error) {
+        console.error("Checkout error:", error);
+        alert(error.message || "Gagal menyimpan pesanan ke database.");
+      } finally {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML = originalText;
+      }
     });
   });
 
@@ -60,7 +128,7 @@ function persistCheckoutForm() {
 
 function syncCheckoutForm() {
   const saved = getCheckoutInfo();
-  const user = JSON.parse(localStorage.getItem("admin_user") || "{}");
+  const user = getCurrentUser() || {};
 
   const nameInput = document.getElementById("checkoutName");
   const phoneInput = document.getElementById("checkoutPhone");
@@ -68,10 +136,10 @@ function syncCheckoutForm() {
   const addressInput = document.getElementById("checkoutAddress");
   const noteInput = document.getElementById("checkoutNote");
 
-  if (nameInput) nameInput.value = saved.name || user.name || "";
-  if (phoneInput) phoneInput.value = saved.phone || "";
+  if (nameInput) nameInput.value = saved.name || user.name || user.nama || "";
+  if (phoneInput) phoneInput.value = saved.phone || user.phone || user.whatsapp || "";
   if (methodInput) methodInput.value = saved.method || "Ambil di toko";
-  if (addressInput) addressInput.value = saved.address || "";
+  if (addressInput) addressInput.value = saved.address || user.address || "";
   if (noteInput) noteInput.value = saved.note || "";
 }
 
@@ -100,6 +168,7 @@ function renderCart() {
             src="${item.image_url ? getImageUrl(item.image_url) : 'https://via.placeholder.com/84'}"
             alt="${item.name}"
             class="cart-thumb"
+            onerror="this.onerror=null;this.src='https://via.placeholder.com/84';"
           >
           <div>
             <div class="cart-name">${item.name}</div>
